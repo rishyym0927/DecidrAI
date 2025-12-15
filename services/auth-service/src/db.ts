@@ -1,15 +1,18 @@
-import { Db } from "mongodb";
-import { connectMongo } from "../../../packages/db/src/mongo";
+import mongoose from "mongoose";
 
-let db: Db | null = null;
-
-
-export async function getDB(): Promise<Db> {
-  if (!db) {
-    db = await connectMongo(
-      process.env.MONGODB_URI!,
-      process.env.MONGODB_DB_NAME!
-    );
+export async function connectDB(): Promise<void> {
+  if (mongoose.connection.readyState >= 1) {
+    return;
   }
-  return db;
+
+  try {
+    await mongoose.connect(process.env.MONGODB_URI!, {
+      dbName: process.env.MONGODB_DB_NAME,
+    });
+    console.log("Mongoose connected");
+  } catch (err) {
+    console.error("Mongoose connection failed:", err);
+    throw err;
+  }
 }
+

@@ -1,23 +1,30 @@
 import express from "express";
 import dotenv from "dotenv";
-import { getDB } from "./db";
+import { connectDB } from "./db";
+
+import clerkWebhook from "./routes/clerkWebhook";
 
 dotenv.config();
 
 const app = express();
+app.use("/webhooks", clerkWebhook); 
+
 app.use(express.json());
 
 app.get("/health", async (_, res) => {
   try {
-    await getDB(); 
+    await connectDB();
     res.json({ status: "ok", db: "connected" });
-    const result = await getDB();
-    console.log(result);
   } catch (err) {
     res.status(500).json({ status: "error" });
   }
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`🚀 Auth service on ${process.env.PORT}`);
+app.listen(process.env.PORT, async () => {
+  try {
+    await connectDB();
+    console.log(`🚀 Auth service on ${process.env.PORT}`);
+  } catch (err) {
+    console.error("Failed to connect to DB on startup:", err);
+  }
 });
