@@ -7,9 +7,10 @@ export async function connectMongo(
   dbName: string
 ): Promise<Db> {
   if (!client) {
-    client = new MongoClient(uri);
-    await client.connect();
+    const newClient = new MongoClient(uri);
+    await newClient.connect();
     console.log("✅ MongoDB connected");
+    client = newClient;
   }
 
   return client.db(dbName);
