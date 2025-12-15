@@ -4,7 +4,13 @@ const redis = getRedisClient();
 
 export async function getCachedRecommendations(key: string) {
   const data = await redis.get(key);
-  return data ? JSON.parse(data) : null;
+  if (!data) return null;
+  try {
+    return JSON.parse(data);
+  } catch (e) {
+    // Optionally log the error here
+    return null;
+  }
 }
 
 export async function setCachedRecommendations(
