@@ -19,11 +19,14 @@ app.get("/health", async (_, res) => {
 
 //test route
 app.get("/redis-test", async (_, res) => {
-  const redis = getRedisClient();
-  await redis.set("test", "hello");
-  const value = await redis.get("test");
-
-  res.json({ redisWorking: value === "hello" });
+  try {
+    const redis = getRedisClient();
+    await redis.set("test", "hello");
+    const value = await redis.get("test");
+    res.json({ redisWorking: value === "hello" });
+  } catch (err) {
+    res.status(500).json({ status: "error", message: "Redis operation failed" });
+  }
 });
 
 app.listen(process.env.PORT, () => {
