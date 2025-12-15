@@ -11,6 +11,10 @@ app.use("/webhooks", clerkWebhook);
 
 app.use(express.json());
 
+if (!process.env.CLERK_WEBHOOK_SECRET) {
+  throw new Error("Missing CLERK_WEBHOOK_SECRET");
+}
+
 app.get("/health", async (_, res) => {
   try {
     await connectDB();
