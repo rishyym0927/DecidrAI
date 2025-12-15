@@ -13,9 +13,9 @@ export async function getCachedRecommendations(key: string) {
   }
 }
 
-export async function setCachedRecommendations(
+export async function setCachedRecommendations<T>(
   key: string,
-  value: any,
+  value: T,
   ttlSeconds = 86400
 ) {
   await redis.set(key, JSON.stringify(value), "EX", ttlSeconds);
