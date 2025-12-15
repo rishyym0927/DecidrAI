@@ -20,11 +20,12 @@
 
 ```
 ├── apps/
-│   ├── frontend/          # Next.js web application
+│   ├── frontend/          # Next.js 16 web application
 │   └── api-gateway/       # Main entry point for backend services
 ├── services/              # Microservices
-│   ├── auth/              # Authentication service
-│   ├── flow/              # Recommendation flow logic
+│   ├── auth-service/      # Authentication service (Clerk + MongoDB)
+│   ├── flow-service/      # Recommendation flow logic
+│   ├── analytics-service/ # User behavior tracking
 │   └── ...
 ├── packages/              # Shared libraries
 │   ├── db/                # Database schemas and connection
@@ -36,15 +37,28 @@
 
 ### Prerequisites
 
-*   Node.js (LTS version recommended)
-*   PNPM (`npm install -g pnpm`)
-*   MongoDB & Redis (locally or via URIs)
+*   **Node.js** (LTS version recommended)
+*   **PNPM** (`npm install -g pnpm`)
+*   **Docker** (Optional, for running local DBs)
+
+### External Services Setup
+
+Before running the project, you need to set up the following accounts:
+
+1.  **Clerk**: Create an account for authentication.
+    *   Obtain your `CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`.
+    *   Create a **Webhook** pointing to your auth-service (e.g., via ngrok tunnel) for syncing user data. The endpoint is typically `/webhooks/clerk`.
+    *   Get the `CLERK_WEBHOOK_SECRET`.
+2.  **MongoDB**: Create an Atlas cluster or run locally.
+    *   Get your connection URI (`MONGODB_URI`).
+3.  **Redis**: Create an Upstash account or run locally.
+    *   Get your connection details for caching.
 
 ### Installation
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-org/DecidrAI.git
+    git clone https://github.com/rishyym0927/DecidrAI.git
     cd DecidrAI
     ```
 
@@ -54,8 +68,22 @@
     ```
 
 3.  **Environment Setup:**
-    *   Copy `.env.example` to `.env` in respective apps/services (if applicable).
-    *   Ensure database connections are set.
+    *   Copy `.env.example` to `.env` in `apps/frontend/`, `services/auth-service/`, and other active services.
+    *   Populate the keys obtained in the "External Services Setup" step.
+
+    **Frontend (.env.local):**
+    ```env
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=...
+
+    ```
+
+    **Auth Service (.env):**
+    ```env
+    PORT=5002
+    MONGODB_URI=...
+    CLERK_SECRET_KEY=...
+    CLERK_WEBHOOK_SECRET=...
+    ```
 
 ### Running the App
 
@@ -65,7 +93,13 @@ To run the entire stack in development mode:
 pnpm dev
 ```
 
-This will start all applications and services in parallel using Turbo.
+This will start all applications and services (Frontend, API Gateway, Auth Service, etc.) in parallel using Turbo.
+
+### Webhook Development
+To test Clerk webhooks locally:
+1.  Run `pnpm dev`.
+2.  Use **ngrok** to tunnel port `5002` (Auth Service): `ngrok http 5002`
+3.  Add the ngrok URL to Clerk Dashboard Webhooks (e.g., `https://<your-ngrok-id>.ngrok-free.app/webhooks/clerk`).
 
 ## 🤝 Contributing
 
