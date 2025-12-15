@@ -17,6 +17,9 @@ export function getRedisClient() {
     redis = new Redis(process.env.REDIS_URL, {
       password: process.env.REDIS_TOKEN,
     });
+    redis.on('error', (err) => {
+      console.error('Redis connection error:', err);
+    });
   }
 
   return redis;
