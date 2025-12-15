@@ -1,0 +1,23 @@
+import Redis from "ioredis";
+
+/**
+ * We create ONE Redis client.
+ * Services reuse it.
+ * Simple, predictable, production-safe.
+ */
+
+let redis: Redis | null = null;
+
+export function getRedisClient() {
+  if (!redis) {
+    if (!process.env.REDIS_URL || !process.env.REDIS_TOKEN) {
+      throw new Error("Redis env variables missing");
+    }
+
+    redis = new Redis(process.env.REDIS_URL, {
+      password: process.env.REDIS_TOKEN,
+    });
+  }
+
+  return redis;
+}
