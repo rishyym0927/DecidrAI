@@ -2,7 +2,7 @@
   "name": "recommendation-service",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --respawn src/index.ts"
@@ -13,7 +13,8 @@
   "packageManager": "pnpm@10.25.0",
   "dependencies": {
     "dotenv": "^17.2.3",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mongodb": "^7.0.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

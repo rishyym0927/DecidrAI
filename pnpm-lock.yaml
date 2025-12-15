@@ -102,6 +102,28 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  services/auth-service:
+    dependencies:
+      dotenv:
+        specifier: ^17.2.3
+        version: 17.2.3
+      express:
+        specifier: ^5.2.1
+        version: 5.2.1
+      mongodb:
+        specifier: ^7.0.0
+        version: 7.0.0
+    devDependencies:
+      '@types/express':
+        specifier: ^5.0.6
+        version: 5.0.6
+      ts-node-dev:
+        specifier: ^2.0.0
+        version: 2.0.0(@types/node@25.0.2)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   services/recommendation-service:
     dependencies:
       dotenv:
@@ -110,6 +132,9 @@ importers:
       express:
         specifier: ^5.2.1
         version: 5.2.1
+      mongodb:
+        specifier: ^7.0.0
+        version: 7.0.0
     devDependencies:
       '@types/express':
         specifier: ^5.0.6
