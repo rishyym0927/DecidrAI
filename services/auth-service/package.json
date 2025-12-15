@@ -1,20 +1,24 @@
 {
-  "name": "db",
+  "name": "auth-service",
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node-dev --respawn src/index.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.25.0",
   "dependencies": {
-    "ioredis": "^5.8.2",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
     "mongodb": "^7.0.0"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   }
 }

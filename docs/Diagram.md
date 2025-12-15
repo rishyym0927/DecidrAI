@@ -82,36 +82,14 @@ This pipeline balances performance (via caching) with explainability (via AI-gen
 The database schema is designed around user intent, interactions, and explainable recommendations.
 
 ### Core Collections
-
-#### `users`
-
-* Stores authentication and profile data
-* Maintains saved tools and saved flows
-* Holds subscription-related information
-
-#### `flows`
-
-* Defines intent-based discovery flows
-* Contains questions, tags, and scoring weights
-
-#### `tools`
-
-* Stores tool metadata including pricing, categories, problems solved, learning curve, API availability, affiliate links, and verification status
-
-#### `interactions`
-
-* Logs user behavior such as views, clicks, and comparisons
-* Links users, flows, tools, and comparison records
-* Used for analytics and recommendation tuning
-
-#### `comparisons`
-
-* Stores AI-generated summaries for tool comparisons
-* References multiple tools and includes creation timestamps
-
-The schema is optimized for read-heavy workloads and analytics.
-
-<img width="1112" height="1097" alt="diagram-export-15-12-2025-11_09_54" src="https://github.com/user-attachments/assets/e7bf8d1a-aa94-4a6e-b116-59b527e3fa96" />
+| Service                    | Database                   | Collections                 |
+| -------------------------- | -------------------------- | --------------------------- |
+| **auth-service**           | `decidrai_auth`            | `users`, `sessions`         |
+| **tool-service**           | `decidrai_tools`           | `tools`, `categories`       |
+| **flow-service**           | `decidrai_flows`           | `flows`, `questions`        |
+| **recommendation-service** | `decidrai_recommendations` | `recommendations`, `scores` |
+| **comparison-service**     | `decidrai_comparisons`     | `comparisons`               |
+| **analytics-service**      | `decidrai_analytics`       | `interactions`, `events`    |
 
 
 ---
