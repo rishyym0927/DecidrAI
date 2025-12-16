@@ -1,6 +1,6 @@
 import express from "express";
 import { Webhook } from "svix";
-import { User } from "../models/User";
+import { upsertUser, deleteUser } from "../services/user.service";
 
 const clerkWebhook = express.Router();
 
@@ -30,26 +30,17 @@ clerkWebhook.post(
         console.log(`👤 Processing user ${event.type}:`, data.id);
 
         try {
-          // Use findOneAndUpdate with upsert: true to handle both create and update
-          // and self-healing if we missed the create event.
-          const user = await User.findOneAndUpdate(
-            { clerkUserId: data.id },
-            {
-              clerkUserId: data.id,
-              email: data.email_addresses[0]?.email_address,
-              name: `${data.first_name ?? ""} ${data.last_name ?? ""}`,
-              image: data.image_url
-            },
-            { upsert: true, new: true }
-          );
-          console.log("🎉 User saved in DB:", user._id);
+          const user = await upsertUser(data);
+          if (user) {
+            console.log("🎉 User saved in DB:", user._id);
+          }
         } catch (dbErr) {
           console.error("❌ Database operation failed:", dbErr);
         }
       } else if (event.type === "user.deleted") {
         const data = event.data;
         try {
-          await User.findOneAndDelete({ clerkUserId: data.id });
+          await deleteUser(data.id);
           console.log("🗑️ User deleted:", data.id);
         } catch (err) {
           console.error("Delete failed:", err);
