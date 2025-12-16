@@ -84,7 +84,7 @@ The database schema is designed around user intent, interactions, and explainabl
 ### Core Collections
 | Service                    | Database                   | Collections                 |
 | -------------------------- | -------------------------- | --------------------------- |
-| **auth-service**           | `decidrai_auth`            | `users`, `sessions`         |
+| **auth-service**           | `decidrai_auth`            | `users`        |
 | **tool-service**           | `decidrai_tools`           | `tools`, `categories`       |
 | **flow-service**           | `decidrai_flows`           | `flows`, `questions`        |
 | **recommendation-service** | `decidrai_recommendations` | `recommendations`, `scores` |
