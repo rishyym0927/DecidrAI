@@ -8,10 +8,10 @@ import authRoutes from "./routes/auth.routes";
 dotenv.config();
 
 const app = express();
+app.use(express.json());
 app.use("/webhooks", clerkWebhook);
 app.use("/auth", authRoutes);
 
-app.use(express.json());
 
 if (!process.env.CLERK_WEBHOOK_SECRET) {
   throw new Error("Missing CLERK_WEBHOOK_SECRET");

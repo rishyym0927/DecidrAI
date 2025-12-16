@@ -1,9 +1,11 @@
 import { verifyToken } from "@clerk/backend";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 export const validateClerkSession = async (token: string) => {
+    if (!process.env.CLERK_SECRET_KEY) {
+        console.error("Missing CLERK_SECRET_KEY environment variable");
+        return null; // Or throw, but returning null matches the existing error handling signature
+    }
+
     try {
         const result = await verifyToken(token, {
             secretKey: process.env.CLERK_SECRET_KEY,
@@ -17,6 +19,6 @@ export const validateClerkSession = async (token: string) => {
         return result.data;
     } catch (error) {
         console.error("Clerk validation error:", error);
-        return null; // Return null if verification fails
+        return null;
     }
 };
