@@ -11,12 +11,16 @@ export const validateClerkSession = async (token: string) => {
             secretKey: process.env.CLERK_SECRET_KEY,
         });
 
-        if (result.errors) {
+        if (result && typeof result === "object" && "errors" in result && result.errors) {
             console.error("Clerk validation error:", result.errors);
             return null;
         }
 
-        return result.data;
+        if (result && typeof result === "object" && "data" in result) {
+            return result.data;
+        }
+        // If result is not as expected, return null
+        return null;
     } catch (error) {
         console.error("Clerk validation error:", error);
         return null;
