@@ -1,7 +1,11 @@
 import { User } from "../models/User";
+
+// Define a union type for user roles
+export type UserRole = "admin" | "moderator" | "user";
+
 export async function upgradeUserRole(
     clerkUserId: string,
-    role: "admin"
+    role: UserRole
 ) {
     return User.findOneAndUpdate(
         { clerkUserId },
