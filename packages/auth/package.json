@@ -1,0 +1,21 @@
+{
+    "name": "@decidrai/auth",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "dev": "tsc -w"
+    },
+    "dependencies": {
+        "@clerk/backend": "^1.21.4"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.0",
+        "typescript": "^5.3.3",
+        "express": "^4.19.2"
+    },
+    "peerDependencies": {
+        "express": "^4.0.0 || ^5.0.0"
+    }
+}
