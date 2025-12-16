@@ -3,11 +3,13 @@ import dotenv from "dotenv";
 import { connectDB } from "./db";
 
 import clerkWebhook from "./routes/clerkWebhook";
+import authRoutes from "./routes/auth.routes";
 
 dotenv.config();
 
 const app = express();
-app.use("/webhooks", clerkWebhook); 
+app.use("/webhooks", clerkWebhook);
+app.use("/auth", authRoutes);
 
 app.use(express.json());
 

@@ -32,3 +32,7 @@ export async function upsertUser(data: {
 export async function deleteUser(clerkUserId: string) {
     return User.findOneAndDelete({ clerkUserId });
 }
+
+export async function getUserByClerkId(clerkUserId: string) {
+    return User.findOne({ clerkUserId });
+}
