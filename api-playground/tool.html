@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" data-service="tool">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool Service - API Playground</title>
+    <meta name="description" content="Test Tool Service API endpoints">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <a href="index.html" class="back-link">
+        <span>←</span>
+        <span>Dashboard</span>
+    </a>
+
+    <div class="container">
+        <header>
+            <div class="header-badge">
+                <span class="dot"></span>
+                <span>Port 5003</span>
+            </div>
+            <h1>🛠️ Tool Service</h1>
+            <p>Manage AI tools directory, search, and CRUD operations</p>
+        </header>
+
+        <div class="main-layout">
+            <!-- Sidebar Controls -->
+            <div class="sidebar">
+                <!-- System Health -->
+                <section class="card">
+                    <h2>System</h2>
+                    <div class="control-section">
+                        <h3>Health Check</h3>
+                        <div class="control-group">
+                            <button id="test-health-btn" class="primary-btn full-width">
+                                Check Health
+                            </button>
+                            <div id="health-status" class="status-indicator"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Public Endpoints -->
+                <section class="card">
+                    <h2>Public API</h2>
+
+                    <div class="control-section">
+                        <h3>Get All Tools</h3>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <div class="input-group">
+                                <input type="number" id="limit-input" placeholder="Limit (e.g., 10)" class="text-input"
+                                    min="1" max="100">
+                            </div>
+                            <select id="category-select" class="text-input">
+                                <option value="">All Categories</option>
+                                <option value="productivity">Productivity</option>
+                                <option value="writing">Writing</option>
+                                <option value="coding">Coding</option>
+                                <option value="design">Design</option>
+                                <option value="marketing">Marketing</option>
+                                <option value="analytics">Analytics</option>
+                            </select>
+                            <button id="get-tools-btn" class="secondary-btn full-width">
+                                GET /tools
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h3>Search Tools</h3>
+                        <div class="input-group">
+                            <input type="text" id="search-input" placeholder="Search query..." class="text-input">
+                            <button id="search-tools-btn" class="primary-btn icon-btn" title="Search">🔍</button>
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+                            GET /tools/search?q={query}
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h3>Get by Slug</h3>
+                        <input type="text" id="slug-input" placeholder="tool-slug" class="text-input"
+                            style="margin-bottom: 0.5rem;">
+                        <div class="input-group">
+                            <button id="get-tool-slug-btn" class="secondary-btn full-width">
+                                Get Tool
+                            </button>
+                            <button id="get-related-btn" class="secondary-btn" title="Get Related Tools">
+                                Related
+                            </button>
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+                            GET /tools/:slug | /tools/:slug/related
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Admin Endpoints -->
+                <section class="card">
+                    <h2>Admin API</h2>
+                    <div
+                        style="font-size: 0.75rem; color: var(--warning); margin-bottom: 1rem; padding: 0.5rem; background: rgba(245, 158, 11, 0.1); border-radius: 6px;">
+                        ⚠️ Protected routes - requires API Gateway auth
+                    </div>
+
+                    <div class="control-section">
+                        <h3>Tool ID</h3>
+                        <input type="text" id="tool-id-input" placeholder="MongoDB ObjectId" class="text-input">
+                    </div>
+
+                    <div class="control-section">
+                        <h3>Request Body (JSON)</h3>
+                        <textarea id="request-body" class="text-input" placeholder='{
+  "name": "Tool Name",
+  "slug": "tool-name",
+  "description": "Description...",
+  "categories": ["productivity"]
+}'></textarea>
+                    </div>
+
+                    <div class="control-section" style="border-bottom: none;">
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <button id="create-tool-btn" class="primary-btn full-width">
+                                POST /admin/tools
+                            </button>
+                            <button id="update-tool-btn" class="secondary-btn full-width">
+                                PATCH /admin/tools/:id
+                            </button>
+                            <button id="delete-tool-btn" class="danger-btn full-width">
+                                DELETE /admin/tools/:id
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Response Panel -->
+            <main class="content">
+                <section class="card response-card">
+                    <div class="response-header">
+                        <h2>Response</h2>
+                        <div class="meta-info">
+                            <div class="view-toggle">
+                                <button id="view-visual" class="toggle-btn active">Visual</button>
+                                <button id="view-json" class="toggle-btn">JSON</button>
+                            </div>
+                            <span id="response-meta" class="meta-tag">Waiting...</span>
+                        </div>
+                    </div>
+
+                    <div class="response-area">
+                        <div class="response-area-inner">
+                            <div id="visual-response" class="visual-content">
+                                <div class="empty-state">
+                                    <div class="icon">🛠️</div>
+                                    <h3>Ready to Test</h3>
+                                    <p>Select an endpoint from the sidebar to make an API request</p>
+                                </div>
+                            </div>
+                            <pre id="tool-response" class="json-content"
+                                style="display: none;">Waiting for action...</pre>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" data-service="auth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Service - API Playground</title>
+    <meta name="description" content="Test Auth Service API endpoints">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <a href="index.html" class="back-link">
+        <span>←</span>
+        <span>Dashboard</span>
+    </a>
+
+    <div class="container">
+        <header>
+            <div class="header-badge">
+                <span class="dot"></span>
+                <span>Port 5002</span>
+            </div>
+            <h1>🔐 Auth Service</h1>
+            <p>Authentication, user management, and Clerk webhook integrations</p>
+        </header>
+
+        <div class="main-layout">
+            <!-- Sidebar Controls -->
+            <div class="sidebar">
+                <!-- System Health -->
+                <section class="card">
+                    <h2>System</h2>
+                    <div class="control-section">
+                        <h3>Health Check</h3>
+                        <div class="control-group">
+                            <button id="test-health-btn" class="primary-btn full-width">
+                                Check Health
+                            </button>
+                            <div id="health-status" class="status-indicator"></div>
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+                            GET /health
+                        </div>
+                    </div>
+                </section>
+
+                <!-- User Endpoints -->
+                <section class="card">
+                    <h2>User API</h2>
+
+                    <div class="control-section">
+                        <h3>Get Current User</h3>
+                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                            Requires Clerk authentication. Paste your Bearer token below.
+                        </p>
+                        <input type="text" id="auth-token-input" placeholder="Bearer token (from Clerk)"
+                            class="text-input" style="margin-bottom: 0.5rem;">
+                        <button id="get-me-btn" class="primary-btn full-width">
+                            GET /me
+                        </button>
+                        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+                            Returns authenticated user profile
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Webhook Info -->
+                <section class="card">
+                    <h2>Webhooks</h2>
+                    <div class="control-section" style="border-bottom: none;">
+                        <h3>Clerk Webhook</h3>
+                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                            Handles user lifecycle events from Clerk:
+                        </p>
+                        <div class="endpoint-list">
+                            <div class="endpoint-item" style="cursor: default;">
+                                <span class="method-badge method-post">POST</span>
+                                <span class="endpoint-path">/webhooks/clerk</span>
+                            </div>
+                        </div>
+                        <div
+                            style="margin-top: 1rem; padding: 0.75rem; background: var(--bg-primary); border-radius: 8px; font-size: 0.75rem;">
+                            <div style="color: var(--text-secondary); margin-bottom: 0.5rem;">Supported Events:</div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                <span class="tag"
+                                    style="background: rgba(16, 185, 129, 0.15); color: var(--success);">user.created</span>
+                                <span class="tag"
+                                    style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">user.updated</span>
+                                <span class="tag"
+                                    style="background: rgba(239, 68, 68, 0.15); color: var(--error);">user.deleted</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Response Panel -->
+            <main class="content">
+                <section class="card response-card">
+                    <div class="response-header">
+                        <h2>Response</h2>
+                        <div class="meta-info">
+                            <div class="view-toggle">
+                                <button id="view-visual" class="toggle-btn active">Visual</button>
+                                <button id="view-json" class="toggle-btn">JSON</button>
+                            </div>
+                            <span id="response-meta" class="meta-tag">Waiting...</span>
+                        </div>
+                    </div>
+
+                    <div class="response-area">
+                        <div class="response-area-inner">
+                            <div id="visual-response" class="visual-content">
+                                <div class="empty-state">
+                                    <div class="icon">🔐</div>
+                                    <h3>Ready to Test</h3>
+                                    <p>Check the service health or test user authentication</p>
+                                </div>
+                            </div>
+                            <pre id="tool-response" class="json-content"
+                                style="display: none;">Waiting for action...</pre>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

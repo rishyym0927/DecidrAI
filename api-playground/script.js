@@ -1,0 +1,689 @@
+/**
+ * DecidrAI API Playground - Unified Script
+ * Handles all microservice endpoints with visual and JSON responses
+ */
+
+// ====================================
+// Configuration
+// ====================================
+
+const CONFIG = {
+    services: {
+        tool: { baseUrl: 'http://localhost:5003', name: 'Tool Service' },
+        auth: { baseUrl: 'http://localhost:5002', name: 'Auth Service' },
+        recommendation: { baseUrl: 'http://localhost:5001', name: 'Recommendation Service' }
+    }
+};
+
+// Detect current service from HTML data attribute
+const currentService = document.documentElement.dataset.service || 'tool';
+const SERVICE_URL = CONFIG.services[currentService]?.baseUrl || 'http://localhost:5003';
+
+// ====================================
+// DOM Elements
+// ====================================
+
+const elements = {
+    // Common
+    responsePre: document.getElementById('tool-response'),
+    responseMeta: document.getElementById('response-meta'),
+    healthStatus: document.getElementById('health-status'),
+    visualResponse: document.getElementById('visual-response'),
+    viewVisualBtn: document.getElementById('view-visual'),
+    viewJsonBtn: document.getElementById('view-json'),
+
+    // Tool Service
+    healthBtn: document.getElementById('test-health-btn'),
+    getToolsBtn: document.getElementById('get-tools-btn'),
+    searchToolsBtn: document.getElementById('search-tools-btn'),
+    getToolSlugBtn: document.getElementById('get-tool-slug-btn'),
+    getRelatedBtn: document.getElementById('get-related-btn'),
+    createToolBtn: document.getElementById('create-tool-btn'),
+    updateToolBtn: document.getElementById('update-tool-btn'),
+    deleteToolBtn: document.getElementById('delete-tool-btn'),
+    searchInput: document.getElementById('search-input'),
+    slugInput: document.getElementById('slug-input'),
+    toolIdInput: document.getElementById('tool-id-input'),
+    requestBodyInput: document.getElementById('request-body'),
+    limitInput: document.getElementById('limit-input'),
+    categorySelect: document.getElementById('category-select'),
+
+    // Auth Service
+    getMeBtn: document.getElementById('get-me-btn'),
+    authTokenInput: document.getElementById('auth-token-input'),
+
+    // Recommendation Service
+    testRedisBtn: document.getElementById('test-redis-btn')
+};
+
+// ====================================
+// Utilities
+// ====================================
+
+/**
+ * Syntax highlight JSON for display
+ */
+function syntaxHighlight(json) {
+    if (typeof json !== 'string') {
+        json = JSON.stringify(json, null, 2);
+    }
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(
+        /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+        (match) => {
+            let cls = 'number';
+            if (/^"/.test(match)) {
+                cls = /:$/.test(match) ? 'key' : 'string';
+            } else if (/true|false/.test(match)) {
+                cls = 'boolean';
+            } else if (/null/.test(match)) {
+                cls = 'null';
+            }
+            return `<span class="${cls}">${match}</span>`;
+        }
+    );
+}
+
+/**
+ * Format date for display
+ */
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+// ====================================
+// View Toggle
+// ====================================
+
+let currentView = 'visual';
+
+function toggleView(mode) {
+    currentView = mode;
+    if (elements.viewVisualBtn && elements.viewJsonBtn) {
+        if (mode === 'visual') {
+            elements.viewVisualBtn.classList.add('active');
+            elements.viewJsonBtn.classList.remove('active');
+            if (elements.visualResponse) elements.visualResponse.style.display = 'block';
+            if (elements.responsePre) elements.responsePre.style.display = 'none';
+        } else {
+            elements.viewVisualBtn.classList.remove('active');
+            elements.viewJsonBtn.classList.add('active');
+            if (elements.visualResponse) elements.visualResponse.style.display = 'none';
+            if (elements.responsePre) elements.responsePre.style.display = 'block';
+        }
+    }
+}
+
+// ====================================
+// Visual Renderers
+// ====================================
+
+const visualRenderers = {
+    /**
+     * Render loading state
+     */
+    loading() {
+        return `
+            <div class="empty-state">
+                <div class="icon">⏳</div>
+                <h3>Loading...</h3>
+                <p>Fetching data from the server</p>
+            </div>
+        `;
+    },
+
+    /**
+     * Render error state
+     */
+    error(message) {
+        return `
+            <div class="empty-state fade-in">
+                <div class="icon">❌</div>
+                <h3>Error</h3>
+                <p>${message}</p>
+            </div>
+        `;
+    },
+
+    /**
+     * Render health check
+     */
+    health(data, isSuccess) {
+        const dbStatus = data.db || data.mongodb || data.database || 'Unknown';
+        return `
+            <div class="health-visual fade-in">
+                <div class="health-icon ${isSuccess ? 'success' : 'error'}">
+                    ${isSuccess ? '✅' : '❌'}
+                </div>
+                <div class="health-title">${isSuccess ? 'Service Healthy' : 'Service Error'}</div>
+                <div class="health-subtitle">All systems ${isSuccess ? 'operational' : 'experiencing issues'}</div>
+                <div class="health-details">
+                    <div class="health-detail">
+                        <span class="status-dot" style="background: ${isSuccess ? 'var(--success)' : 'var(--error)'}"></span>
+                        <span>Status: ${data.status || 'unknown'}</span>
+                    </div>
+                    <div class="health-detail">
+                        <span class="status-dot" style="background: ${dbStatus !== 'Unknown' ? 'var(--success)' : 'var(--warning)'}"></span>
+                        <span>Database: ${dbStatus}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    /**
+     * Render tools grid
+     */
+    toolsGrid(tools) {
+        if (!tools || tools.length === 0) {
+            return `
+                <div class="empty-state fade-in">
+                    <div class="icon">📭</div>
+                    <h3>No Tools Found</h3>
+                    <p>Try adjusting your search or filters</p>
+                </div>
+            `;
+        }
+
+        const cards = tools.map((tool, index) => `
+            <div class="tool-card fade-in" style="animation-delay: ${index * 50}ms">
+                <h3>${tool.name || 'Unknown Tool'}</h3>
+                <div class="desc">${tool.short_description || tool.description || 'No description available'}</div>
+                <div class="meta">
+                    <span class="tag">${tool.categories?.[0] || 'Uncategorized'}</span>
+                    <span style="font-size: 0.75rem; color: var(--text-tertiary);">
+                        ${tool.pricing?.model || 'Free'}
+                    </span>
+                </div>
+            </div>
+        `).join('');
+
+        return `<div class="tools-grid">${cards}</div>`;
+    },
+
+    /**
+     * Render single tool detail
+     */
+    toolDetail(tool) {
+        const categories = (tool.categories || [])
+            .map(cat => `<span class="tag">${cat}</span>`)
+            .join('');
+
+        const features = (tool.features || [])
+            .slice(0, 5)
+            .map(f => `<li>${f}</li>`)
+            .join('');
+
+        return `
+            <div class="tool-card fade-in" style="max-width: 600px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div>
+                        <h3 style="font-size: 1.5rem; margin-bottom: 0.25rem;">${tool.name}</h3>
+                        <div style="font-size: 0.8rem; color: var(--text-tertiary);">/${tool.slug}</div>
+                    </div>
+                    <span class="tag" style="background: var(--accent-glow); color: var(--accent-tertiary);">
+                        ${tool.pricing?.model || 'Free'}
+                    </span>
+                </div>
+                
+                <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+                    ${tool.long_description || tool.description || 'No description available.'}
+                </p>
+
+                ${features ? `
+                    <div style="margin-bottom: 1rem;">
+                        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); margin-bottom: 0.5rem;">Features</div>
+                        <ul style="padding-left: 1rem; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.8;">
+                            ${features}
+                        </ul>
+                    </div>
+                ` : ''}
+
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                    ${categories}
+                </div>
+
+                <div class="meta" style="font-size: 0.8rem;">
+                    <span>Views: ${tool.view_count || 0}</span>
+                    <span>Status: <span style="color: ${tool.status === 'active' ? 'var(--success)' : 'var(--warning)'};">${tool.status || 'unknown'}</span></span>
+                </div>
+            </div>
+        `;
+    },
+
+    /**
+     * Render user profile
+     */
+    userProfile(user) {
+        const initials = (user.firstName?.[0] || '') + (user.lastName?.[0] || '') || '?';
+        return `
+            <div class="user-card fade-in">
+                <div class="user-avatar">${initials}</div>
+                <div class="user-name">${user.firstName || ''} ${user.lastName || ''}</div>
+                <div class="user-email">${user.email || 'No email'}</div>
+                <div class="user-meta">
+                    <div class="user-meta-item">
+                        <div class="label">Joined</div>
+                        <div class="value">${formatDate(user.createdAt)}</div>
+                    </div>
+                    <div class="user-meta-item">
+                        <div class="label">Role</div>
+                        <div class="value">${user.role || 'User'}</div>
+                    </div>
+                    <div class="user-meta-item">
+                        <div class="label">Status</div>
+                        <div class="value" style="color: var(--success);">Active</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    /**
+     * Render Redis test result
+     */
+    redisTest(data) {
+        const isWorking = data.redisWorking === true;
+        return `
+            <div class="health-visual fade-in">
+                <div class="health-icon ${isWorking ? 'success' : 'error'}">
+                    ${isWorking ? '🔴' : '❌'}
+                </div>
+                <div class="health-title">Redis ${isWorking ? 'Connected' : 'Error'}</div>
+                <div class="health-subtitle">${isWorking ? 'Cache layer is operational' : 'Redis connection failed'}</div>
+            </div>
+        `;
+    },
+
+    /**
+     * Render success message
+     */
+    success(message, details = null) {
+        return `
+            <div class="empty-state fade-in">
+                <div class="icon">✅</div>
+                <h3>${message}</h3>
+                ${details ? `<p>${details}</p>` : ''}
+            </div>
+        `;
+    }
+};
+
+/**
+ * Render visual response based on data type
+ */
+function renderVisual(data, endpoint = '') {
+    if (!elements.visualResponse) return;
+
+    // Health check
+    if (endpoint.includes('/health')) {
+        elements.visualResponse.innerHTML = visualRenderers.health(data, data.status === 'ok');
+        return;
+    }
+
+    // Redis test
+    if (endpoint.includes('/redis-test')) {
+        elements.visualResponse.innerHTML = visualRenderers.redisTest(data);
+        return;
+    }
+
+    // User profile (/me)
+    if (endpoint.includes('/me') && data && (data.firstName || data.email || data.clerkId)) {
+        elements.visualResponse.innerHTML = visualRenderers.userProfile(data);
+        return;
+    }
+
+    // Success response with user data
+    if (data?.success && data?.data && (data.data.firstName || data.data.email)) {
+        elements.visualResponse.innerHTML = visualRenderers.userProfile(data.data);
+        return;
+    }
+
+    // Tools list
+    if (data?.success && data?.data?.tools && Array.isArray(data.data.tools)) {
+        elements.visualResponse.innerHTML = visualRenderers.toolsGrid(data.data.tools);
+        return;
+    }
+
+    // Single tool
+    if (data?.success && data?.data?.name && data?.data?.slug) {
+        elements.visualResponse.innerHTML = visualRenderers.toolDetail(data.data);
+        return;
+    }
+
+    // Direct array of tools
+    const toolsArray = Array.isArray(data) ? data : (data?.data && Array.isArray(data.data) ? data.data : null);
+    if (toolsArray) {
+        elements.visualResponse.innerHTML = visualRenderers.toolsGrid(toolsArray);
+        return;
+    }
+
+    // Success message for mutations
+    if (data?.success && data?.message) {
+        elements.visualResponse.innerHTML = visualRenderers.success(data.message);
+        return;
+    }
+
+    // Default: No visual available
+    elements.visualResponse.innerHTML = `
+        <div class="empty-state fade-in">
+            <div class="icon">📋</div>
+            <h3>Response Received</h3>
+            <p>Switch to JSON view for detailed data</p>
+        </div>
+    `;
+}
+
+// ====================================
+// API Fetcher
+// ====================================
+
+async function fetchAPI(url, options = {}) {
+    const startTime = performance.now();
+    const method = options.method || 'GET';
+    const displayUrl = url.replace(SERVICE_URL, '');
+
+    // Update meta
+    if (elements.responseMeta) {
+        elements.responseMeta.textContent = `${method} ${displayUrl} ...`;
+        elements.responseMeta.className = 'meta-tag';
+    }
+
+    // Show loading state
+    if (elements.responsePre) {
+        elements.responsePre.textContent = 'Loading...';
+    }
+    if (elements.visualResponse) {
+        elements.visualResponse.innerHTML = visualRenderers.loading();
+    }
+
+    try {
+        const response = await fetch(url, {
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+
+        const data = await response.json();
+        const endTime = performance.now();
+        const duration = (endTime - startTime).toFixed(0);
+
+        // Update JSON view
+        if (elements.responsePre) {
+            elements.responsePre.innerHTML = syntaxHighlight(data);
+        }
+
+        // Update visual view
+        renderVisual(data, displayUrl);
+
+        // Update meta
+        if (elements.responseMeta) {
+            elements.responseMeta.textContent = `${response.status} ${response.statusText} • ${duration}ms`;
+            elements.responseMeta.className = `meta-tag ${response.ok ? 'success' : 'error'}`;
+        }
+
+        return { success: response.ok, data, status: response.status };
+
+    } catch (error) {
+        const endTime = performance.now();
+        const duration = (endTime - startTime).toFixed(0);
+
+        // Update JSON view
+        if (elements.responsePre) {
+            elements.responsePre.textContent = `Error: ${error.message}\n\nMake sure the service is running at ${SERVICE_URL}`;
+        }
+
+        // Update visual view
+        if (elements.visualResponse) {
+            elements.visualResponse.innerHTML = visualRenderers.error(`Failed to connect to ${SERVICE_URL}`);
+        }
+
+        // Update meta
+        if (elements.responseMeta) {
+            elements.responseMeta.textContent = `Network Error • ${duration}ms`;
+            elements.responseMeta.className = 'meta-tag error';
+        }
+
+        return { success: false, error };
+    }
+}
+
+// ====================================
+// Event Listeners - Tool Service
+// ====================================
+
+function initToolServiceListeners() {
+    // Health Check
+    if (elements.healthBtn) {
+        elements.healthBtn.addEventListener('click', async () => {
+            if (elements.healthStatus) {
+                elements.healthStatus.className = 'status-indicator status-loading';
+            }
+            const result = await fetchAPI(`${SERVICE_URL}/health`);
+            if (elements.healthStatus) {
+                elements.healthStatus.className = `status-indicator ${result.success ? 'status-success' : 'status-error'}`;
+            }
+        });
+    }
+
+    // Get All Tools
+    if (elements.getToolsBtn) {
+        elements.getToolsBtn.addEventListener('click', () => {
+            let url = `${SERVICE_URL}/tools`;
+            const params = new URLSearchParams();
+
+            if (elements.limitInput?.value) {
+                params.append('limit', elements.limitInput.value);
+            }
+            if (elements.categorySelect?.value) {
+                params.append('category', elements.categorySelect.value);
+            }
+
+            if (params.toString()) {
+                url += `?${params.toString()}`;
+            }
+
+            fetchAPI(url);
+        });
+    }
+
+    // Search Tools
+    if (elements.searchToolsBtn) {
+        elements.searchToolsBtn.addEventListener('click', () => {
+            const query = elements.searchInput?.value.trim();
+            if (!query) {
+                alert('Please enter a search query');
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/tools/search?q=${encodeURIComponent(query)}`);
+        });
+    }
+
+    // Get Tool by Slug
+    if (elements.getToolSlugBtn) {
+        elements.getToolSlugBtn.addEventListener('click', () => {
+            const slug = elements.slugInput?.value.trim();
+            if (!slug) {
+                alert('Please enter a tool slug');
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/tools/${encodeURIComponent(slug)}`);
+        });
+    }
+
+    // Get Related Tools
+    if (elements.getRelatedBtn) {
+        elements.getRelatedBtn.addEventListener('click', () => {
+            const slug = elements.slugInput?.value.trim();
+            if (!slug) {
+                alert('Please enter a tool slug');
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/tools/${encodeURIComponent(slug)}/related`);
+        });
+    }
+
+    // Create Tool (Admin)
+    if (elements.createToolBtn) {
+        elements.createToolBtn.addEventListener('click', () => {
+            let body;
+            try {
+                body = JSON.parse(elements.requestBodyInput?.value || '{}');
+            } catch (e) {
+                alert('Invalid JSON in request body');
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/admin/tools`, {
+                method: 'POST',
+                body: JSON.stringify(body)
+            });
+        });
+    }
+
+    // Update Tool (Admin)
+    if (elements.updateToolBtn) {
+        elements.updateToolBtn.addEventListener('click', () => {
+            const id = elements.toolIdInput?.value.trim();
+            if (!id) {
+                alert('Please enter a tool ID');
+                return;
+            }
+            let body;
+            try {
+                body = JSON.parse(elements.requestBodyInput?.value || '{}');
+            } catch (e) {
+                alert('Invalid JSON in request body');
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/admin/tools/${encodeURIComponent(id)}`, {
+                method: 'PATCH',
+                body: JSON.stringify(body)
+            });
+        });
+    }
+
+    // Delete Tool (Admin)
+    if (elements.deleteToolBtn) {
+        elements.deleteToolBtn.addEventListener('click', () => {
+            const id = elements.toolIdInput?.value.trim();
+            if (!id) {
+                alert('Please enter a tool ID');
+                return;
+            }
+            if (!confirm('Are you sure you want to delete this tool?')) {
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/admin/tools/${encodeURIComponent(id)}`, {
+                method: 'DELETE'
+            });
+        });
+    }
+
+    // Enter key support
+    if (elements.searchInput) {
+        elements.searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') elements.searchToolsBtn?.click();
+        });
+    }
+    if (elements.slugInput) {
+        elements.slugInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') elements.getToolSlugBtn?.click();
+        });
+    }
+}
+
+// ====================================
+// Event Listeners - Auth Service
+// ====================================
+
+function initAuthServiceListeners() {
+    // Health Check
+    if (elements.healthBtn) {
+        elements.healthBtn.addEventListener('click', async () => {
+            if (elements.healthStatus) {
+                elements.healthStatus.className = 'status-indicator status-loading';
+            }
+            const result = await fetchAPI(`${SERVICE_URL}/health`);
+            if (elements.healthStatus) {
+                elements.healthStatus.className = `status-indicator ${result.success ? 'status-success' : 'status-error'}`;
+            }
+        });
+    }
+
+    // Get Current User (/me)
+    if (elements.getMeBtn) {
+        elements.getMeBtn.addEventListener('click', () => {
+            const token = elements.authTokenInput?.value.trim();
+            const headers = {};
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            fetchAPI(`${SERVICE_URL}/me`, { headers });
+        });
+    }
+}
+
+// ====================================
+// Event Listeners - Recommendation Service
+// ====================================
+
+function initRecommendationServiceListeners() {
+    // Health Check
+    if (elements.healthBtn) {
+        elements.healthBtn.addEventListener('click', async () => {
+            if (elements.healthStatus) {
+                elements.healthStatus.className = 'status-indicator status-loading';
+            }
+            const result = await fetchAPI(`${SERVICE_URL}/health`);
+            if (elements.healthStatus) {
+                elements.healthStatus.className = `status-indicator ${result.success ? 'status-success' : 'status-error'}`;
+            }
+        });
+    }
+
+    // Test Redis
+    if (elements.testRedisBtn) {
+        elements.testRedisBtn.addEventListener('click', () => {
+            fetchAPI(`${SERVICE_URL}/redis-test`);
+        });
+    }
+}
+
+// ====================================
+// Initialize
+// ====================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize view toggle
+    if (elements.viewVisualBtn) {
+        elements.viewVisualBtn.addEventListener('click', () => toggleView('visual'));
+    }
+    if (elements.viewJsonBtn) {
+        elements.viewJsonBtn.addEventListener('click', () => toggleView('json'));
+    }
+
+    // Initialize based on current service
+    switch (currentService) {
+        case 'tool':
+            initToolServiceListeners();
+            break;
+        case 'auth':
+            initAuthServiceListeners();
+            break;
+        case 'recommendation':
+            initRecommendationServiceListeners();
+            break;
+    }
+
+    // Set initial view
+    toggleView('visual');
+
+    console.log(`🎮 API Playground initialized for ${currentService} service`);
+});

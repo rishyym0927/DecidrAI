@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-service="recommendation">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommendation Service - API Playground</title>
+    <meta name="description" content="Test Recommendation Service API endpoints">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <a href="index.html" class="back-link">
+        <span>←</span>
+        <span>Dashboard</span>
+    </a>
+
+    <div class="container">
+        <header>
+            <div class="header-badge">
+                <span class="dot"></span>
+                <span>Port 5001</span>
+            </div>
+            <h1>🎯 Recommendation Service</h1>
+            <p>AI-powered tool recommendations with Redis caching</p>
+        </header>
+
+        <div class="main-layout">
+            <!-- Sidebar Controls -->
+            <div class="sidebar">
+                <!-- System Health -->
+                <section class="card">
+                    <h2>System</h2>
+                    <div class="control-section">
+                        <h3>Health Check</h3>
+                        <div class="control-group">
+                            <button id="test-health-btn" class="primary-btn full-width">
+                                Check Health
+                            </button>
+                            <div id="health-status" class="status-indicator"></div>
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+                            GET /health
+                        </div>
+                    </div>
+
+                    <div class="control-section" style="border-bottom: none;">
+                        <h3>Redis Cache</h3>
+                        <button id="test-redis-btn" class="secondary-btn full-width">
+                            Test Redis Connection
+                        </button>
+                        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+                            GET /redis-test
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Service Info -->
+                <section class="card">
+                    <h2>Service Info</h2>
+                    <div class="control-section" style="border-bottom: none;">
+                        <div style="padding: 1rem; background: var(--bg-primary); border-radius: 8px;">
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div>
+                                    <div
+                                        style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); margin-bottom: 0.25rem;">
+                                        Status</div>
+                                    <div style="font-size: 0.875rem; color: var(--warning);">🚧 In Development</div>
+                                </div>
+                                <div>
+                                    <div
+                                        style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); margin-bottom: 0.25rem;">
+                                        Dependencies</div>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                        <span class="tag">MongoDB</span>
+                                        <span class="tag">Redis</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div
+                                        style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); margin-bottom: 0.25rem;">
+                                        Features</div>
+                                    <ul
+                                        style="padding-left: 1rem; color: var(--text-secondary); font-size: 0.8rem; line-height: 1.8;">
+                                        <li>Intent-based matching</li>
+                                        <li>Tool ranking algorithms</li>
+                                        <li>AI explanations</li>
+                                        <li>Response caching</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Upcoming Endpoints -->
+                <section class="card">
+                    <h2>Upcoming Endpoints</h2>
+                    <div class="control-section" style="border-bottom: none;">
+                        <div style="font-size: 0.75rem; color: var(--text-tertiary); margin-bottom: 0.75rem;">
+                            These endpoints are planned for future releases:
+                        </div>
+                        <div class="endpoint-list">
+                            <div class="endpoint-item" style="opacity: 0.6; cursor: default;">
+                                <span class="method-badge method-post">POST</span>
+                                <span class="endpoint-path">/recommend</span>
+                            </div>
+                            <div class="endpoint-item" style="opacity: 0.6; cursor: default;">
+                                <span class="method-badge method-get">GET</span>
+                                <span class="endpoint-path">/trending</span>
+                            </div>
+                            <div class="endpoint-item" style="opacity: 0.6; cursor: default;">
+                                <span class="method-badge method-get">GET</span>
+                                <span class="endpoint-path">/personalized/:userId</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Response Panel -->
+            <main class="content">
+                <section class="card response-card">
+                    <div class="response-header">
+                        <h2>Response</h2>
+                        <div class="meta-info">
+                            <div class="view-toggle">
+                                <button id="view-visual" class="toggle-btn active">Visual</button>
+                                <button id="view-json" class="toggle-btn">JSON</button>
+                            </div>
+                            <span id="response-meta" class="meta-tag">Waiting...</span>
+                        </div>
+                    </div>
+
+                    <div class="response-area">
+                        <div class="response-area-inner">
+                            <div id="visual-response" class="visual-content">
+                                <div class="empty-state">
+                                    <div class="icon">🎯</div>
+                                    <h3>Ready to Test</h3>
+                                    <p>Check service health or test Redis connectivity</p>
+                                </div>
+                            </div>
+                            <pre id="tool-response" class="json-content"
+                                style="display: none;">Waiting for action...</pre>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

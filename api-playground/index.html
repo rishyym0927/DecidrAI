@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DecidrAI API Playground</title>
+    <meta name="description" content="Test and explore DecidrAI microservices API endpoints">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="header-badge">
+                <span class="dot"></span>
+                <span>API Playground v1.0</span>
+            </div>
+            <h1>DecidrAI API Playground</h1>
+            <p>Explore and test microservices endpoints with real-time responses</p>
+        </header>
+
+        <div class="service-grid">
+            <!-- Tool Service -->
+            <a href="tool.html" class="service-card">
+                <div class="icon">🛠️</div>
+                <h2>Tool Service</h2>
+                <span class="status-badge">Active</span>
+                <p>Manage AI tools directory, search, and filter through the comprehensive tools database.</p>
+                <div class="endpoint-count">
+                    <span class="tag">7 Endpoints</span>
+                </div>
+            </a>
+
+            <!-- Auth Service -->
+            <a href="auth.html" class="service-card">
+                <div class="icon">🔐</div>
+                <h2>Auth Service</h2>
+                <span class="status-badge">Active</span>
+                <p>Handle authentication, user sessions, and Clerk webhook integrations.</p>
+                <div class="endpoint-count">
+                    <span class="tag">3 Endpoints</span>
+                </div>
+            </a>
+
+            <!-- Recommendation Service -->
+            <a href="recommendation.html" class="service-card">
+                <div class="icon">🎯</div>
+                <h2>Recommendation Service</h2>
+                <span class="status-badge">Active</span>
+                <p>AI-powered tool recommendations based on user intent and preferences.</p>
+                <div class="endpoint-count">
+                    <span class="tag">2 Endpoints</span>
+                </div>
+            </a>
+
+            <!-- Comparison Service - WIP -->
+            <div class="service-card disabled">
+                <div class="icon">⚖️</div>
+                <h2>Comparison Service</h2>
+                <span class="status-badge wip-badge">Coming Soon</span>
+                <p>Compare AI tools feature by feature with detailed analysis.</p>
+                <div class="endpoint-count">
+                    <span class="tag">—</span>
+                </div>
+            </div>
+
+            <!-- Flow Service - WIP -->
+            <div class="service-card disabled">
+                <div class="icon">🌊</div>
+                <h2>Flow Service</h2>
+                <span class="status-badge wip-badge">Coming Soon</span>
+                <p>Workflow automation and tool orchestration service.</p>
+                <div class="endpoint-count">
+                    <span class="tag">—</span>
+                </div>
+            </div>
+
+            <!-- Analytics Service - WIP -->
+            <div class="service-card disabled">
+                <div class="icon">📊</div>
+                <h2>Analytics Service</h2>
+                <span class="status-badge wip-badge">Coming Soon</span>
+                <p>Platform usage analytics and insights dashboard.</p>
+                <div class="endpoint-count">
+                    <span class="tag">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Info Footer -->
+        <footer
+            style="margin-top: 3rem; text-align: center; padding: 2rem; border-top: 1px solid var(--border-default);">
+            <div style="display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                <div class="info-item">
+                    <span
+                        style="color: var(--text-tertiary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Tool
+                        Service</span>
+                    <span style="color: var(--text-primary); font-weight: 600;">:5003</span>
+                </div>
+                <div class="info-item">
+                    <span
+                        style="color: var(--text-tertiary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Auth
+                        Service</span>
+                    <span style="color: var(--text-primary); font-weight: 600;">:5002</span>
+                </div>
+                <div class="info-item">
+                    <span
+                        style="color: var(--text-tertiary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Recommendation</span>
+                    <span style="color: var(--text-primary); font-weight: 600;">:5001</span>
+                </div>
+            </div>
+            <p style="color: var(--text-tertiary); font-size: 0.8rem;">
+                Built for DecidrAI Microservices Architecture
+            </p>
+        </footer>
+    </div>
+</body>
+
+</html>
