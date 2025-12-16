@@ -26,7 +26,7 @@ router.get(
             res.json(user);
         } catch (error) {
             console.error("Error fetching user:", error);
-            res.status(500).json({ error: "Internal server error" });
+            res.status(500).json({ error: "Failed to fetch user" });
         }
     }
 );
