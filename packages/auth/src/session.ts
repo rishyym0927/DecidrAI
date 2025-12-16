@@ -1,26 +1,27 @@
 import { verifyToken } from "@clerk/backend";
 
-export const validateClerkSession = async (token: string) => {
+export interface ClerkAuthSession {
+    sub: string;
+    sid?: string;
+    public_metadata?: Record<string, unknown>;
+    role?: string; // Sometimes role is top-level depending on claims
+    [key: string]: any;
+}
+
+export const validateClerkSession = async (token: string): Promise<ClerkAuthSession | null> => {
     if (!process.env.CLERK_SECRET_KEY) {
         console.error("Missing CLERK_SECRET_KEY environment variable");
-        return null; // Or throw, but returning null matches the existing error handling signature
+        return null;
     }
 
     try {
         const result = await verifyToken(token, {
             secretKey: process.env.CLERK_SECRET_KEY,
+            clockSkewInMs: 300 * 1000, // Allow 5 minutes skew
         });
 
-        if (result && typeof result === "object" && "errors" in result && result.errors) {
-            console.error("Clerk validation error:", result.errors);
-            return null;
-        }
+        return result as ClerkAuthSession;
 
-        if (result && typeof result === "object" && "data" in result) {
-            return result.data;
-        }
-        // If result is not as expected, return null
-        return null;
     } catch (error) {
         console.error("Clerk validation error:", error);
         return null;

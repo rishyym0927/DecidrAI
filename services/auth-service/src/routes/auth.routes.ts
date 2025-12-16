@@ -19,14 +19,13 @@ router.get(
             const user = await getUserByClerkId(userId);
 
             if (!user) {
-                res.status(404).json({ error: "User not found" });
-            }
+                return res.status(404).json({ error: "User not found" });
             }
 
-            res.json(user);
+            return res.json(user);
         } catch (error) {
             console.error("Error fetching user:", error);
-            res.status(500).json({ error: "Failed to fetch user" });
+            return res.status(500).json({ error: "Failed to fetch user" });
         }
     }
 );
