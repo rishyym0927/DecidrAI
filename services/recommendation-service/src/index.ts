@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
-import { getDB } from "./db";
-import { getRedisClient } from "../../../packages/db/src/index";
+import { initDB } from "./db";
+import { getRedisClient } from "../../../packages/db/src/redis";
 
 dotenv.config();
 
@@ -10,7 +10,7 @@ app.use(express.json());
 
 app.get("/health", async (_, res) => {
   try {
-    await getDB(); 
+    await initDB();
     res.json({ status: "ok", db: "connected" });
   } catch (err) {
     res.status(500).json({ status: "error" });
@@ -29,6 +29,11 @@ app.get("/redis-test", async (_, res) => {
   }
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`🚀 Recommendation service on ${process.env.PORT}`);
+app.listen(process.env.PORT, async () => {
+  try {
+    await initDB();
+    console.log(`🚀 Recommendation service on ${process.env.PORT}`);
+  } catch (err) {
+    console.error("Failed to connect to DB on startup:", err);
+  }
 });

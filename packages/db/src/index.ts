@@ -1,2 +1,2 @@
-export { connectMongo } from "./mongo";
+export { connectMongo, disconnectMongo } from "./mongo";
 export { getRedisClient } from "./redis";

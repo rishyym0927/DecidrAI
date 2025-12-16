@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import { connectDB } from "./db";
+import { connectMongo } from "../../../packages/db/src/mongo";
 
 import clerkWebhook from "./routes/clerkWebhook";
 import authRoutes from "./routes/auth.routes";
@@ -19,7 +19,10 @@ if (!process.env.CLERK_WEBHOOK_SECRET) {
 
 app.get("/health", async (_, res) => {
   try {
-    await connectDB();
+    await connectMongo(
+      process.env.MONGODB_URI!,
+      process.env.MONGODB_DB_NAME || "decidrai"
+    );
     res.json({ status: "ok", db: "connected" });
   } catch (err) {
     res.status(500).json({ status: "error" });
@@ -28,7 +31,10 @@ app.get("/health", async (_, res) => {
 
 app.listen(process.env.PORT, async () => {
   try {
-    await connectDB();
+    await connectMongo(
+      process.env.MONGODB_URI!,
+      process.env.MONGODB_DB_NAME || "decidrai"
+    );
     console.log(`🚀 Auth service on ${process.env.PORT}`);
   } catch (err) {
     console.error("Failed to connect to DB on startup:", err);

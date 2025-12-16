@@ -1,17 +1,33 @@
-import { MongoClient, Db } from "mongodb";
-
-let client: MongoClient | null = null;
+import mongoose from "mongoose";
 
 export async function connectMongo(
   uri: string,
   dbName: string
-): Promise<Db> {
-  if (!client) {
-    const newClient = new MongoClient(uri);
-    await newClient.connect();
-    console.log("✅ MongoDB connected");
-    client = newClient;
+): Promise<void> {
+  // Check if already connected
+  if (mongoose.connection.readyState >= 1) {
+    console.log("✅ MongoDB already connected");
+    return;
   }
 
-  return client.db(dbName);
+  try {
+    // Append dbName to URI if not already present
+    const connectionUri = uri.includes("?")
+      ? `${uri}&dbName=${dbName}`
+      : `${uri}/${dbName}`;
+
+    await mongoose.connect(connectionUri);
+    console.log("✅ MongoDB connected via Mongoose");
+  } catch (err) {
+    console.error("❌ MongoDB connection failed:", err);
+    throw err;
+  }
+}
+
+// Optional: Export disconnect function for graceful shutdown
+export async function disconnectMongo(): Promise<void> {
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.disconnect();
+    console.log("✅ MongoDB disconnected");
+  }
 }
