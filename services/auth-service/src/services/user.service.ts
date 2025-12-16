@@ -21,7 +21,9 @@ export async function upsertUser(data: {
         { clerkUserId: data.id },
         {
             clerkUserId: data.id,
-            email: data.email_addresses[0]?.email_address,
+            email: (Array.isArray(data.email_addresses) && data.email_addresses.length > 0)
+                ? data.email_addresses[0].email_address
+                : null,
             name: `${data.first_name ?? ""} ${data.last_name ?? ""}`.trim(),
             image: data.image_url,
         },
