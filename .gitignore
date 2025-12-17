@@ -142,4 +142,5 @@ vite.config.ts.timestamp-*
 
 # Turborepo
 .turbo
+
 # api-playground/
