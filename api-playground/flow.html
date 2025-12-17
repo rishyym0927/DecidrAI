@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" data-service="flow">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Service - API Playground</title>
+    <meta name="description" content="Test Flow Service API endpoints">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <a href="index.html" class="back-link">
+        <span>←</span>
+        <span>Dashboard</span>
+    </a>
+
+    <div class="container">
+        <header>
+            <div class="header-badge">
+                <span class="dot"></span>
+                <span>Port 5004</span>
+            </div>
+            <h1>🌊 Flow Service</h1>
+            <p>Intent-based discovery flows with contextual questionnaires</p>
+        </header>
+
+        <div class="main-layout">
+            <!-- Sidebar Controls -->
+            <div class="sidebar">
+                <!-- System Health -->
+                <section class="card">
+                    <h2>System</h2>
+                    <div class="control-section">
+                        <h3>Health Check</h3>
+                        <div class="control-group">
+                            <button id="test-health-btn" class="primary-btn full-width">
+                                Check Health
+                            </button>
+                            <div id="health-status" class="status-indicator"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Public Endpoints -->
+                <section class="card">
+                    <h2>Public API</h2>
+
+                    <div class="control-section">
+                        <h3>Get All Flows</h3>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <select id="category-select" class="text-input">
+                                <option value="">All Categories</option>
+                                <option value="career">Career</option>
+                                <option value="productivity">Productivity</option>
+                                <option value="automation">Automation</option>
+                                <option value="development">Development</option>
+                                <option value="learning">Learning</option>
+                            </select>
+                            <button id="get-flows-btn" class="secondary-btn full-width">
+                                GET /flows
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h3>Get by Slug</h3>
+                        <input type="text" id="slug-input" placeholder="flow-slug (e.g. interview-prep)"
+                            class="text-input" style="margin-bottom: 0.5rem;">
+                        <button id="get-flow-slug-btn" class="secondary-btn full-width">
+                            GET /flows/:slug
+                        </button>
+                    </div>
+
+                    <div class="control-section">
+                        <h3>Start Flow</h3>
+                        <input type="text" id="start-slug-input" placeholder="flow-slug" class="text-input"
+                            style="margin-bottom: 0.5rem;">
+                        <button id="start-flow-btn" class="primary-btn full-width">
+                            POST /flows/:slug/start
+                        </button>
+                        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+                            Starts a new session and returns first question
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Session Endpoints -->
+                <section class="card">
+                    <h2>Session API</h2>
+
+                    <div class="control-section">
+                        <h3>Session ID</h3>
+                        <input type="text" id="session-id-input" placeholder="Session UUID" class="text-input">
+                    </div>
+
+                    <div class="control-section">
+                        <h3>Get Session</h3>
+                        <button id="get-session-btn" class="secondary-btn full-width">
+                            GET /flows/sessions/:id
+                        </button>
+                        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+                            Resume or check session status
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h3>Submit Answer</h3>
+                        <textarea id="answer-body" class="text-input" placeholder='{
+  "questionId": "q1",
+  "value": "software-engineer"
+}'></textarea>
+                        <button id="submit-answer-btn" class="primary-btn full-width" style="margin-top: 0.5rem;">
+                            POST /flows/sessions/:id/answer
+                        </button>
+                    </div>
+
+                    <div class="control-section" style="border-bottom: none;">
+                        <h3>Complete Flow</h3>
+                        <button id="complete-flow-btn" class="secondary-btn full-width">
+                            POST /flows/sessions/:id/complete
+                        </button>
+                        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+                            Marks session complete, returns extracted tags
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Admin Endpoints -->
+                <section class="card">
+                    <h2>Admin API</h2>
+                    <div
+                        style="font-size: 0.75rem; color: var(--warning); margin-bottom: 1rem; padding: 0.5rem; background: rgba(245, 158, 11, 0.1); border-radius: 6px;">
+                        ⚠️ Protected routes - requires API Gateway auth
+                    </div>
+
+                    <div class="control-section">
+                        <h3>Flow ID</h3>
+                        <input type="text" id="flow-id-input" placeholder="MongoDB ObjectId" class="text-input">
+                    </div>
+
+                    <div class="control-section">
+                        <h3>Request Body (JSON)</h3>
+                        <textarea id="request-body" class="text-input" placeholder='{
+  "title": "My Flow",
+  "description": "Description...",
+  "questions": []
+}'></textarea>
+                    </div>
+
+                    <div class="control-section" style="border-bottom: none;">
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <button id="create-flow-btn" class="primary-btn full-width">
+                                POST /admin/flows
+                            </button>
+                            <button id="update-flow-btn" class="secondary-btn full-width">
+                                PATCH /admin/flows/:id
+                            </button>
+                            <button id="delete-flow-btn" class="danger-btn full-width">
+                                DELETE /admin/flows/:id
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Response Panel -->
+            <main class="content">
+                <section class="card response-card">
+                    <div class="response-header">
+                        <h2>Response</h2>
+                        <div class="meta-info">
+                            <div class="view-toggle">
+                                <button id="view-visual" class="toggle-btn active">Visual</button>
+                                <button id="view-json" class="toggle-btn">JSON</button>
+                            </div>
+                            <span id="response-meta" class="meta-tag">Waiting...</span>
+                        </div>
+                    </div>
+
+                    <div class="response-area">
+                        <div class="response-area-inner">
+                            <div id="visual-response" class="visual-content">
+                                <div class="empty-state">
+                                    <div class="icon">🌊</div>
+                                    <h3>Ready to Test</h3>
+                                    <p>Select an endpoint from the sidebar to make an API request</p>
+                                </div>
+                            </div>
+                            <pre id="tool-response" class="json-content"
+                                style="display: none;">Waiting for action...</pre>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
