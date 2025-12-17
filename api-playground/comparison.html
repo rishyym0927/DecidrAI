@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-service="comparison">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparison Service - API Playground</title>
+    <meta name="description" content="Test Comparison Service API endpoints">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <a href="index.html" class="back-link">
+        <span>←</span>
+        <span>Dashboard</span>
+    </a>
+
+    <div class="container">
+        <header>
+            <div class="header-badge">
+                <span class="dot"></span>
+                <span>Port 5005</span>
+            </div>
+            <h1>⚖️ Comparison Service</h1>
+            <p>AI-powered side-by-side tool comparisons with Gemini AI</p>
+        </header>
+
+        <div class="main-layout">
+            <!-- Sidebar Controls -->
+            <div class="sidebar">
+                <!-- System Health -->
+                <section class="card">
+                    <h2>System</h2>
+                    <div class="control-section">
+                        <h3>Health Check</h3>
+                        <div class="control-group">
+                            <button id="test-health-btn" class="primary-btn full-width">
+                                Check Health
+                            </button>
+                            <div id="health-status" class="status-indicator"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Compare Tools -->
+                <section class="card">
+                    <h2>Compare Tools</h2>
+
+                    <div class="control-section">
+                        <h3>By Slugs (GET)</h3>
+                        <input type="text" id="tools-input" placeholder="slug1,slug2 (e.g. zapier,make)"
+                            class="text-input">
+                        <button id="compare-get-btn" class="primary-btn full-width" style="margin-top: 0.5rem;">
+                            GET /compare?tools=...
+                        </button>
+                        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+                            Returns cached or generates new comparison
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h3>Force Regenerate (POST)</h3>
+                        <textarea id="tools-array-input" class="text-input" placeholder='["zapier", "make"]'></textarea>
+                        <button id="compare-post-btn" class="secondary-btn full-width" style="margin-top: 0.5rem;">
+                            POST /compare
+                        </button>
+                        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+                            Always generates fresh comparison
+                        </div>
+                    </div>
+
+                    <div class="control-section" style="border-bottom: none;">
+                        <h3>Popular Comparisons</h3>
+                        <button id="popular-btn" class="secondary-btn full-width">
+                            GET /compare/popular
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Service Info -->
+                <section class="card">
+                    <h2>Service Info</h2>
+                    <div class="control-section" style="border-bottom: none;">
+                        <div style="padding: 1rem; background: var(--bg-primary); border-radius: 8px;">
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div>
+                                    <div
+                                        style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); margin-bottom: 0.25rem;">
+                                        Status</div>
+                                    <div style="font-size: 0.875rem; color: var(--success);">✅ Active</div>
+                                </div>
+                                <div>
+                                    <div
+                                        style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); margin-bottom: 0.25rem;">
+                                        Dependencies</div>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                        <span class="tag">MongoDB</span>
+                                        <span class="tag">Redis</span>
+                                        <span class="tag">Tool Service</span>
+                                        <span class="tag">Gemini AI</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div
+                                        style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); margin-bottom: 0.25rem;">
+                                        Features</div>
+                                    <ul
+                                        style="padding-left: 1rem; color: var(--text-secondary); font-size: 0.8rem; line-height: 1.8;">
+                                        <li>AI-powered summaries</li>
+                                        <li>Winner scenarios</li>
+                                        <li>Feature-by-feature comparison</li>
+                                        <li>7-day caching</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Response Panel -->
+            <main class="content">
+                <section class="card response-card">
+                    <div class="response-header">
+                        <h2>Response</h2>
+                        <div class="meta-info">
+                            <div class="view-toggle">
+                                <button id="view-visual" class="toggle-btn active">Visual</button>
+                                <button id="view-json" class="toggle-btn">JSON</button>
+                            </div>
+                            <span id="response-meta" class="meta-tag">Waiting...</span>
+                        </div>
+                    </div>
+
+                    <div class="response-area">
+                        <div class="response-area-inner">
+                            <div id="visual-response" class="visual-content">
+                                <div class="empty-state">
+                                    <div class="icon">⚖️</div>
+                                    <h3>Ready to Compare</h3>
+                                    <p>Enter tool slugs to generate an AI-powered comparison</p>
+                                </div>
+                            </div>
+                            <pre id="tool-response" class="json-content"
+                                style="display: none;">Waiting for action...</pre>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

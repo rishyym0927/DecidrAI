@@ -12,7 +12,8 @@ const CONFIG = {
         tool: { baseUrl: 'http://localhost:5003', name: 'Tool Service' },
         auth: { baseUrl: 'http://localhost:5002', name: 'Auth Service' },
         recommendation: { baseUrl: 'http://localhost:5001', name: 'Recommendation Service' },
-        flow: { baseUrl: 'http://localhost:5004', name: 'Flow Service' }
+        flow: { baseUrl: 'http://localhost:5004', name: 'Flow Service' },
+        comparison: { baseUrl: 'http://localhost:5005', name: 'Comparison Service' }
     }
 };
 
@@ -75,7 +76,14 @@ const elements = {
     tagsInput: document.getElementById('tags-input'),
     recommendTagsBtn: document.getElementById('recommend-tags-btn'),
     recommendSessionBtn: document.getElementById('recommend-session-btn'),
-    useAICheckbox: document.getElementById('use-ai-checkbox')
+    useAICheckbox: document.getElementById('use-ai-checkbox'),
+
+    // Comparison Service
+    toolsInput: document.getElementById('tools-input'),
+    compareGetBtn: document.getElementById('compare-get-btn'),
+    toolsArrayInput: document.getElementById('tools-array-input'),
+    comparePostBtn: document.getElementById('compare-post-btn'),
+    popularBtn: document.getElementById('popular-btn')
 };
 
 // ====================================
@@ -890,6 +898,72 @@ function initFlowServiceListeners() {
 }
 
 // ====================================
+// Event Listeners - Comparison Service
+// ====================================
+
+function initComparisonServiceListeners() {
+    // Health Check
+    if (elements.healthBtn) {
+        elements.healthBtn.addEventListener('click', async () => {
+            if (elements.healthStatus) {
+                elements.healthStatus.className = 'status-indicator status-loading';
+            }
+            const result = await fetchAPI(`${SERVICE_URL}/health`);
+            if (elements.healthStatus) {
+                elements.healthStatus.className = `status-indicator ${result.success ? 'status-success' : 'status-error'}`;
+            }
+        });
+    }
+
+    // Compare by slugs (GET)
+    if (elements.compareGetBtn) {
+        elements.compareGetBtn.addEventListener('click', () => {
+            const tools = elements.toolsInput?.value.trim();
+            if (!tools) {
+                alert('Please enter tool slugs (comma-separated)');
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/compare?tools=${encodeURIComponent(tools)}`);
+        });
+    }
+
+    // Compare (POST - force regenerate)
+    if (elements.comparePostBtn) {
+        elements.comparePostBtn.addEventListener('click', () => {
+            let tools;
+            try {
+                tools = JSON.parse(elements.toolsArrayInput?.value || '[]');
+            } catch (e) {
+                alert('Invalid JSON. Use format: ["slug1", "slug2"]');
+                return;
+            }
+            if (!Array.isArray(tools) || tools.length < 2) {
+                alert('Please enter at least 2 tool slugs');
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/compare`, {
+                method: 'POST',
+                body: JSON.stringify({ tools })
+            });
+        });
+    }
+
+    // Popular comparisons
+    if (elements.popularBtn) {
+        elements.popularBtn.addEventListener('click', () => {
+            fetchAPI(`${SERVICE_URL}/compare/popular`);
+        });
+    }
+
+    // Enter key support
+    if (elements.toolsInput) {
+        elements.toolsInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') elements.compareGetBtn?.click();
+        });
+    }
+}
+
+// ====================================
 // Initialize
 // ====================================
 
@@ -915,6 +989,9 @@ document.addEventListener('DOMContentLoaded', () => {
             break;
         case 'recommendation':
             initRecommendationServiceListeners();
+            break;
+        case 'comparison':
+            initComparisonServiceListeners();
             break;
     }
 
