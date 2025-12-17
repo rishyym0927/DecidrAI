@@ -19,7 +19,7 @@ DecidrAI/
 │   ├── auth-service/          # ✅ Clerk auth + MongoDB sync - Port 5002
 │   ├── tool-service/          # ✅ Tool CRUD + Search - Port 5003
 │   ├── recommendation-service/ # 🚧 Basic structure only - Port 5001
-│   ├── flow-service/          # ❌ Empty (Planned)
+│   ├── flow-service/          # ✅ Flow engine + Sessions - Port 5004
 │   ├── comparison-service/    # ❌ Empty (Planned)
 │   └── analytics-service/     # ❌ Empty (Planned)
 ├── packages/                  # Shared libraries
@@ -150,46 +150,76 @@ DecidrAI/
 #### 5. Recommendation Service (`services/recommendation-service/`) - Port 5001
 | Component | Status | Details |
 |-----------|--------|---------|
-| Express Server | ✅ Done | Basic health check |
-| MongoDB Connection | ✅ Done | via local `db.ts` |
-| Redis Test Route | ✅ Done | `/redis-test` |
-| Recommendation Logic | ❌ Missing | No scoring, no tag matching |
-| OpenAI Integration | ❌ Missing | No explanation generation |
+| Express Server | ✅ Done | Health check with MongoDB/Redis/Gemini status |
+| Tag Matching | ✅ Done | Score tools based on tag overlap |
+| Ranking | ✅ Done | Diversity penalty, sponsored boost, top N |
+| Gemini AI Explainer | ✅ Done | AI-powered recommendation explanations |
+| Cross-Service | ✅ Done | Fetches tools from tool-service, sessions from flow-service |
+| Cache Service | ✅ Done | Redis caching with TTLs |
 
 **Files:**
-- `/services/recommendation-service/src/index.ts` - Basic server
-- `/services/recommendation-service/src/db.ts` - MongoDB init
-- `/services/recommendation-service/src/cache.ts` - Redis client
+- `/services/recommendation-service/src/index.ts` - Server entry
+- `/services/recommendation-service/src/matchers/tagMatcher.ts` - Tag scoring
+- `/services/recommendation-service/src/ranking/ranking.ts` - Ranking utilities
+- `/services/recommendation-service/src/explainers/explainer.ts` - Gemini AI
+- `/services/recommendation-service/src/services/recommendation.service.ts` - Orchestration
+- `/services/recommendation-service/src/services/cache.service.ts` - Redis caching
+- `/services/recommendation-service/src/controllers/recommendation.controller.ts`
+- `/services/recommendation-service/src/routes/recommendation.routes.ts`
 
-**What's Needed:**
-- Flow answer processing endpoint
-- Tag extraction logic
-- Tool scoring algorithm
-- OpenAI explanation generation
-- Redis caching for recommendations
+**API Endpoints:**
+| Method | Endpoint | Status |
+|--------|----------|--------|
+| GET | `/health` | ✅ With Gemini status |
+| POST | `/recommend` | ✅ Tags input → recommendations |
+| GET | `/recommend/session/:id` | ✅ From flow session |
+| GET | `/redis-test` | ✅ Connection test |
+
+---
+
+#### 6. Flow Service (`services/flow-service/`) - Port 5004
+| Component | Status | Details |
+|-----------|--------|---------|
+| Express Server | ✅ Done | Health check with MongoDB/Redis status |
+| Flow Model | ✅ Done | Questions, tags, scoring weights, conditional logic |
+| FlowSession Model | ✅ Done | Session tracking with 7-day TTL auto-cleanup |
+| CRUD Controllers | ✅ Done | getAllFlows, getBySlug, create, update, delete |
+| Session Controllers | ✅ Done | startFlow, submitAnswer, getSession, completeFlow |
+| Question Engine | ✅ Done | Dynamic question serving, conditional branching |
+| Tag Extraction | ✅ Done | Extract tags from answers with aggregation |
+| Scoring Utilities | ✅ Done | Tag matching algorithm, weight application |
+| Cache Service | ✅ Done | Redis caching with TTLs |
+| Seed Script | ✅ Done | 5 sample flows (interview-prep, content-creation, etc.) |
+
+**Files:**
+- `/services/flow-service/src/index.ts` - Server entry
+- `/services/flow-service/src/models/Flow.ts` - Flow schema with questions
+- `/services/flow-service/src/models/FlowSession.ts` - Session tracking
+- `/services/flow-service/src/controllers/flow.controller.ts` - All endpoints
+- `/services/flow-service/src/routes/flow.routes.ts` - Route definitions
+- `/services/flow-service/src/services/cache.service.ts` - Redis caching
+- `/services/flow-service/src/services/flow.service.ts` - Business logic
+- `/services/flow-service/src/engine/questionEngine.ts` - Question logic
+- `/services/flow-service/src/scoring/scoring.ts` - Scoring algorithms
+- `/services/flow-service/src/scripts/seed.ts` - 5 sample flows
+
+**API Endpoints:**
+| Method | Endpoint | Status |
+|--------|----------|--------|
+| GET | `/flows` | ✅ Pagination, category filter |
+| GET | `/flows/:slug` | ✅ Flow with questions |
+| POST | `/flows/:slug/start` | ✅ Start session, return first question |
+| POST | `/flows/sessions/:id/answer` | ✅ Submit answer, get next question |
+| GET | `/flows/sessions/:id` | ✅ Get session status (resume) |
+| POST | `/flows/sessions/:id/complete` | ✅ Complete flow, return tags |
+| POST | `/admin/flows` | ✅ Create flow |
+| PATCH | `/admin/flows/:id` | ✅ Update flow |
+| DELETE | `/admin/flows/:id` | ✅ Soft delete (archive) |
 
 ---
 
 ### ❌ **SERVICES - NOT IMPLEMENTED**
 
-#### 6. Flow Service (`services/flow-service/`)
-**Status:** Empty shell - only directory structure exists
-
-**Existing Directories (all empty):**
-- `src/controllers/`
-- `src/engine/`
-- `src/models/`
-- `src/routes/`
-- `src/scoring/`
-
-**What's Needed:**
-- Flow model (questions, tags, weights)
-- Question engine (dynamic rendering)
-- Tag extraction from answers
-- Scoring algorithm
-- CRUD endpoints
-
----
 
 #### 7. Comparison Service (`services/comparison-service/`)
 **Status:** Empty directory
@@ -269,8 +299,8 @@ Interactive HTML/JS testing UI for all services.
 | **Services** | | |
 | Auth Service | ✅ Complete | 100% |
 | Tool Service | ✅ Complete | 100% |
-| Recommendation Service | 🚧 Partial | 15% |
-| Flow Service | ❌ Not Started | 0% |
+| Recommendation Service | ✅ Complete | 100% |
+| Flow Service | ✅ Complete | 100% |
 | Comparison Service | ❌ Not Started | 0% |
 | Analytics Service | ❌ Not Started | 0% |
 | **Packages** | | |
@@ -287,14 +317,12 @@ Interactive HTML/JS testing UI for all services.
 ## 🎯 NEXT STEPS (Recommended Order)
 
 ### Immediate Priority
-1. **Flow Service** - Core user-facing feature
-   - Flow model with question schema
-   - Tag mapping logic
-   - CRUD endpoints
+1. **Complete Recommendation Service**
+   - Connect to Flow Service for tag extraction
+   - Implement scoring algorithm using extracted tags
+   - Add OpenAI explanation generation
    
-2. **Complete Recommendation Service**
-   - Connect to Flow Service
-   - Implement scoring algorithm
+2. **Frontend Flow UI**
    - Add OpenAI explanation generation
 
 ### Secondary Priority

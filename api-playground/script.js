@@ -11,7 +11,8 @@ const CONFIG = {
     services: {
         tool: { baseUrl: 'http://localhost:5003', name: 'Tool Service' },
         auth: { baseUrl: 'http://localhost:5002', name: 'Auth Service' },
-        recommendation: { baseUrl: 'http://localhost:5001', name: 'Recommendation Service' }
+        recommendation: { baseUrl: 'http://localhost:5001', name: 'Recommendation Service' },
+        flow: { baseUrl: 'http://localhost:5004', name: 'Flow Service' }
     }
 };
 
@@ -53,7 +54,28 @@ const elements = {
     authTokenInput: document.getElementById('auth-token-input'),
 
     // Recommendation Service
-    testRedisBtn: document.getElementById('test-redis-btn')
+    testRedisBtn: document.getElementById('test-redis-btn'),
+
+    // Flow Service
+    getFlowsBtn: document.getElementById('get-flows-btn'),
+    getFlowSlugBtn: document.getElementById('get-flow-slug-btn'),
+    startFlowBtn: document.getElementById('start-flow-btn'),
+    startSlugInput: document.getElementById('start-slug-input'),
+    sessionIdInput: document.getElementById('session-id-input'),
+    getSessionBtn: document.getElementById('get-session-btn'),
+    submitAnswerBtn: document.getElementById('submit-answer-btn'),
+    answerBodyInput: document.getElementById('answer-body'),
+    completeFlowBtn: document.getElementById('complete-flow-btn'),
+    createFlowBtn: document.getElementById('create-flow-btn'),
+    updateFlowBtn: document.getElementById('update-flow-btn'),
+    deleteFlowBtn: document.getElementById('delete-flow-btn'),
+    flowIdInput: document.getElementById('flow-id-input'),
+
+    // Recommendation Service
+    tagsInput: document.getElementById('tags-input'),
+    recommendTagsBtn: document.getElementById('recommend-tags-btn'),
+    recommendSessionBtn: document.getElementById('recommend-session-btn'),
+    useAICheckbox: document.getElementById('use-ai-checkbox')
 };
 
 // ====================================
@@ -654,6 +676,217 @@ function initRecommendationServiceListeners() {
             fetchAPI(`${SERVICE_URL}/redis-test`);
         });
     }
+
+    // Recommend by Tags
+    if (elements.recommendTagsBtn) {
+        elements.recommendTagsBtn.addEventListener('click', () => {
+            let tags;
+            try {
+                tags = JSON.parse(elements.tagsInput?.value || '[]');
+            } catch (e) {
+                alert('Invalid JSON in tags input. Use format: ["tag1", "tag2"]');
+                return;
+            }
+            if (!Array.isArray(tags) || tags.length === 0) {
+                alert('Please enter at least one tag');
+                return;
+            }
+            const limit = elements.limitInput?.value || 3;
+            const useAI = elements.useAICheckbox?.checked ?? true;
+
+            fetchAPI(`${SERVICE_URL}/recommend`, {
+                method: 'POST',
+                body: JSON.stringify({ tags, limit: Number(limit), useAI })
+            });
+        });
+    }
+
+    // Recommend by Session
+    if (elements.recommendSessionBtn) {
+        elements.recommendSessionBtn.addEventListener('click', () => {
+            const sessionId = elements.sessionIdInput?.value.trim();
+            if (!sessionId) {
+                alert('Please enter a session ID');
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/recommend/session/${encodeURIComponent(sessionId)}`);
+        });
+    }
+}
+
+// ====================================
+// Event Listeners - Flow Service
+// ====================================
+
+function initFlowServiceListeners() {
+    // Health Check
+    if (elements.healthBtn) {
+        elements.healthBtn.addEventListener('click', async () => {
+            if (elements.healthStatus) {
+                elements.healthStatus.className = 'status-indicator status-loading';
+            }
+            const result = await fetchAPI(`${SERVICE_URL}/health`);
+            if (elements.healthStatus) {
+                elements.healthStatus.className = `status-indicator ${result.success ? 'status-success' : 'status-error'}`;
+            }
+        });
+    }
+
+    // Get All Flows
+    if (elements.getFlowsBtn) {
+        elements.getFlowsBtn.addEventListener('click', () => {
+            let url = `${SERVICE_URL}/flows`;
+            const params = new URLSearchParams();
+
+            if (elements.categorySelect?.value) {
+                params.append('category', elements.categorySelect.value);
+            }
+
+            if (params.toString()) {
+                url += `?${params.toString()}`;
+            }
+
+            fetchAPI(url);
+        });
+    }
+
+    // Get Flow by Slug
+    if (elements.getFlowSlugBtn) {
+        elements.getFlowSlugBtn.addEventListener('click', () => {
+            const slug = elements.slugInput?.value.trim();
+            if (!slug) {
+                alert('Please enter a flow slug');
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/flows/${encodeURIComponent(slug)}`);
+        });
+    }
+
+    // Start Flow
+    if (elements.startFlowBtn) {
+        elements.startFlowBtn.addEventListener('click', () => {
+            const slug = elements.startSlugInput?.value.trim();
+            if (!slug) {
+                alert('Please enter a flow slug');
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/flows/${encodeURIComponent(slug)}/start`, {
+                method: 'POST',
+                body: JSON.stringify({})
+            });
+        });
+    }
+
+    // Get Session
+    if (elements.getSessionBtn) {
+        elements.getSessionBtn.addEventListener('click', () => {
+            const sessionId = elements.sessionIdInput?.value.trim();
+            if (!sessionId) {
+                alert('Please enter a session ID');
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/flows/sessions/${encodeURIComponent(sessionId)}`);
+        });
+    }
+
+    // Submit Answer
+    if (elements.submitAnswerBtn) {
+        elements.submitAnswerBtn.addEventListener('click', () => {
+            const sessionId = elements.sessionIdInput?.value.trim();
+            if (!sessionId) {
+                alert('Please enter a session ID');
+                return;
+            }
+            let body;
+            try {
+                body = JSON.parse(elements.answerBodyInput?.value || '{}');
+            } catch (e) {
+                alert('Invalid JSON in answer body');
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/flows/sessions/${encodeURIComponent(sessionId)}/answer`, {
+                method: 'POST',
+                body: JSON.stringify(body)
+            });
+        });
+    }
+
+    // Complete Flow
+    if (elements.completeFlowBtn) {
+        elements.completeFlowBtn.addEventListener('click', () => {
+            const sessionId = elements.sessionIdInput?.value.trim();
+            if (!sessionId) {
+                alert('Please enter a session ID');
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/flows/sessions/${encodeURIComponent(sessionId)}/complete`, {
+                method: 'POST'
+            });
+        });
+    }
+
+    // Create Flow (Admin)
+    if (elements.createFlowBtn) {
+        elements.createFlowBtn.addEventListener('click', () => {
+            let body;
+            try {
+                body = JSON.parse(elements.requestBodyInput?.value || '{}');
+            } catch (e) {
+                alert('Invalid JSON in request body');
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/admin/flows`, {
+                method: 'POST',
+                body: JSON.stringify(body)
+            });
+        });
+    }
+
+    // Update Flow (Admin)
+    if (elements.updateFlowBtn) {
+        elements.updateFlowBtn.addEventListener('click', () => {
+            const id = elements.flowIdInput?.value.trim();
+            if (!id) {
+                alert('Please enter a flow ID');
+                return;
+            }
+            let body;
+            try {
+                body = JSON.parse(elements.requestBodyInput?.value || '{}');
+            } catch (e) {
+                alert('Invalid JSON in request body');
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/admin/flows/${encodeURIComponent(id)}`, {
+                method: 'PATCH',
+                body: JSON.stringify(body)
+            });
+        });
+    }
+
+    // Delete Flow (Admin)
+    if (elements.deleteFlowBtn) {
+        elements.deleteFlowBtn.addEventListener('click', () => {
+            const id = elements.flowIdInput?.value.trim();
+            if (!id) {
+                alert('Please enter a flow ID');
+                return;
+            }
+            if (!confirm('Are you sure you want to delete this flow?')) {
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/admin/flows/${encodeURIComponent(id)}`, {
+                method: 'DELETE'
+            });
+        });
+    }
+
+    // Enter key support for slug input
+    if (elements.slugInput) {
+        elements.slugInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') elements.getFlowSlugBtn?.click();
+        });
+    }
 }
 
 // ====================================
@@ -676,6 +909,9 @@ document.addEventListener('DOMContentLoaded', () => {
             break;
         case 'auth':
             initAuthServiceListeners();
+            break;
+        case 'flow':
+            initFlowServiceListeners();
             break;
         case 'recommendation':
             initRecommendationServiceListeners();

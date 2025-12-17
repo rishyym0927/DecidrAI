@@ -22,7 +22,7 @@
                 <span>Port 5001</span>
             </div>
             <h1>🎯 Recommendation Service</h1>
-            <p>AI-powered tool recommendations with Redis caching</p>
+            <p>AI-powered tool recommendations with Gemini AI explanations</p>
         </header>
 
         <div class="main-layout">
@@ -39,9 +39,6 @@
                             </button>
                             <div id="health-status" class="status-indicator"></div>
                         </div>
-                        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.5rem;">
-                            GET /health
-                        </div>
                     </div>
 
                     <div class="control-section" style="border-bottom: none;">
@@ -49,8 +46,39 @@
                         <button id="test-redis-btn" class="secondary-btn full-width">
                             Test Redis Connection
                         </button>
+                    </div>
+                </section>
+
+                <!-- Recommendation Endpoints -->
+                <section class="card">
+                    <h2>Get Recommendations</h2>
+
+                    <div class="control-section">
+                        <h3>By Tags (Direct)</h3>
+                        <textarea id="tags-input" class="text-input"
+                            placeholder='["coding", "beginner", "free"]'></textarea>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                            <input type="number" id="limit-input" placeholder="Limit (3)" class="text-input" value="3"
+                                min="1" max="10" style="width: 80px;">
+                            <label
+                                style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.8rem; color: var(--text-secondary);">
+                                <input type="checkbox" id="use-ai-checkbox" checked>
+                                Use AI
+                            </label>
+                        </div>
+                        <button id="recommend-tags-btn" class="primary-btn full-width" style="margin-top: 0.5rem;">
+                            POST /recommend
+                        </button>
+                    </div>
+
+                    <div class="control-section" style="border-bottom: none;">
+                        <h3>By Flow Session</h3>
+                        <input type="text" id="session-id-input" placeholder="Session UUID" class="text-input">
+                        <button id="recommend-session-btn" class="secondary-btn full-width" style="margin-top: 0.5rem;">
+                            GET /recommend/session/:id
+                        </button>
                         <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.5rem;">
-                            GET /redis-test
+                            Uses tags extracted from completed flow
                         </div>
                     </div>
                 </section>
@@ -65,7 +93,7 @@
                                     <div
                                         style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); margin-bottom: 0.25rem;">
                                         Status</div>
-                                    <div style="font-size: 0.875rem; color: var(--warning);">🚧 In Development</div>
+                                    <div style="font-size: 0.875rem; color: var(--success);">✅ Active</div>
                                 </div>
                                 <div>
                                     <div
@@ -74,6 +102,9 @@
                                     <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                                         <span class="tag">MongoDB</span>
                                         <span class="tag">Redis</span>
+                                        <span class="tag">Tool Service</span>
+                                        <span class="tag">Flow Service</span>
+                                        <span class="tag">Gemini AI</span>
                                     </div>
                                 </div>
                                 <div>
@@ -82,36 +113,12 @@
                                         Features</div>
                                     <ul
                                         style="padding-left: 1rem; color: var(--text-secondary); font-size: 0.8rem; line-height: 1.8;">
-                                        <li>Intent-based matching</li>
-                                        <li>Tool ranking algorithms</li>
-                                        <li>AI explanations</li>
+                                        <li>Tag-based matching</li>
+                                        <li>Tool ranking with diversity</li>
+                                        <li>Gemini AI explanations</li>
                                         <li>Response caching</li>
                                     </ul>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Upcoming Endpoints -->
-                <section class="card">
-                    <h2>Upcoming Endpoints</h2>
-                    <div class="control-section" style="border-bottom: none;">
-                        <div style="font-size: 0.75rem; color: var(--text-tertiary); margin-bottom: 0.75rem;">
-                            These endpoints are planned for future releases:
-                        </div>
-                        <div class="endpoint-list">
-                            <div class="endpoint-item" style="opacity: 0.6; cursor: default;">
-                                <span class="method-badge method-post">POST</span>
-                                <span class="endpoint-path">/recommend</span>
-                            </div>
-                            <div class="endpoint-item" style="opacity: 0.6; cursor: default;">
-                                <span class="method-badge method-get">GET</span>
-                                <span class="endpoint-path">/trending</span>
-                            </div>
-                            <div class="endpoint-item" style="opacity: 0.6; cursor: default;">
-                                <span class="method-badge method-get">GET</span>
-                                <span class="endpoint-path">/personalized/:userId</span>
                             </div>
                         </div>
                     </div>
@@ -138,7 +145,7 @@
                                 <div class="empty-state">
                                     <div class="icon">🎯</div>
                                     <h3>Ready to Test</h3>
-                                    <p>Check service health or test Redis connectivity</p>
+                                    <p>Enter tags or a session ID to get AI-powered recommendations</p>
                                 </div>
                             </div>
                             <pre id="tool-response" class="json-content"
