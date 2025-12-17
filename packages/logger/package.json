@@ -1,0 +1,26 @@
+{
+    "name": "logger",
+    "version": "1.0.0",
+    "description": "Shared logging utilities for DecidrAI services",
+    "main": "./src/index.ts",
+    "types": "./src/index.ts",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "logging",
+        "shared"
+    ],
+    "author": "",
+    "license": "ISC",
+    "packageManager": "pnpm@10.25.0",
+    "dependencies": {},
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "@types/express": "^5.0.6",
+        "typescript": "^5.9.3"
+    },
+    "peerDependencies": {
+        "express": "^4.0.0 || ^5.0.0"
+    }
+}

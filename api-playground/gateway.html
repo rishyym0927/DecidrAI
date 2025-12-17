@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" data-service="gateway">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Gateway - API Playground</title>
+    <meta name="description" content="Test API Gateway endpoints">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <a href="index.html" class="back-link">
+        <span>←</span>
+        <span>Dashboard</span>
+    </a>
+
+    <div class="container">
+        <header>
+            <div class="header-badge">
+                <span class="dot"></span>
+                <span>Port 4000</span>
+            </div>
+            <h1>🌐 API Gateway</h1>
+            <p>Central entry point for all microservices with auth, rate limiting & proxying</p>
+        </header>
+
+        <div class="main-layout">
+            <!-- Sidebar Controls -->
+            <div class="sidebar">
+                <!-- System Health -->
+                <section class="card">
+                    <h2>System</h2>
+                    <div class="control-section">
+                        <h3>Gateway Health</h3>
+                        <div class="control-group">
+                            <button id="test-health-btn" class="primary-btn full-width">
+                                Check Health
+                            </button>
+                            <div id="health-status" class="status-indicator"></div>
+                        </div>
+                    </div>
+
+                    <div class="control-section" style="border-bottom: none;">
+                        <h3>All Services Health</h3>
+                        <button id="test-services-btn" class="secondary-btn full-width">
+                            GET /test/services
+                        </button>
+                        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+                            Check health of all microservices
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Test Routes -->
+                <section class="card">
+                    <h2>Test Routes</h2>
+
+                    <div class="control-section">
+                        <h3>Echo Request</h3>
+                        <select id="echo-method" class="text-input" style="margin-bottom: 0.5rem;">
+                            <option value="GET">GET</option>
+                            <option value="POST">POST</option>
+                            <option value="PUT">PUT</option>
+                            <option value="DELETE">DELETE</option>
+                        </select>
+                        <button id="echo-btn" class="secondary-btn full-width">
+                            /test/echo
+                        </button>
+                        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+                            Echo back request details for debugging
+                        </div>
+                    </div>
+
+                    <div class="control-section" style="border-bottom: none;">
+                        <h3>Protected Test</h3>
+                        <input type="text" id="auth-token" placeholder="Bearer token (optional)" class="text-input">
+                        <button id="protected-btn" class="secondary-btn full-width" style="margin-top: 0.5rem;">
+                            GET /test/protected
+                        </button>
+                        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+                            Test authentication (expects 401 without token)
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Proxy Routes -->
+                <section class="card">
+                    <h2>Proxy Test</h2>
+
+                    <div class="control-section">
+                        <h3>Tools (via Gateway)</h3>
+                        <button id="proxy-tools-btn" class="primary-btn full-width">
+                            GET /api/tools
+                        </button>
+                    </div>
+
+                    <div class="control-section">
+                        <h3>Flows (via Gateway)</h3>
+                        <button id="proxy-flows-btn" class="secondary-btn full-width">
+                            GET /api/flows
+                        </button>
+                    </div>
+
+                    <div class="control-section" style="border-bottom: none;">
+                        <h3>Compare (via Gateway)</h3>
+                        <input type="text" id="compare-slugs" placeholder="slug1,slug2" class="text-input">
+                        <button id="proxy-compare-btn" class="secondary-btn full-width" style="margin-top: 0.5rem;">
+                            GET /api/compare
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Service Info -->
+                <section class="card">
+                    <h2>Service Info</h2>
+                    <div class="control-section" style="border-bottom: none;">
+                        <div style="padding: 1rem; background: var(--bg-primary); border-radius: 8px;">
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div>
+                                    <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); margin-bottom: 0.25rem;">
+                                        Status</div>
+                                    <div style="font-size: 0.875rem; color: var(--success);">✅ Active</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); margin-bottom: 0.25rem;">
+                                        Features</div>
+                                    <ul style="padding-left: 1rem; color: var(--text-secondary); font-size: 0.8rem; line-height: 1.8;">
+                                        <li>Helmet security headers</li>
+                                        <li>Rate limiting (100/15min)</li>
+                                        <li>Clerk JWT authentication</li>
+                                        <li>Service proxying</li>
+                                        <li>Request logging</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Response Panel -->
+            <main class="content">
+                <section class="card response-card">
+                    <div class="response-header">
+                        <h2>Response</h2>
+                        <div class="meta-info">
+                            <div class="view-toggle">
+                                <button id="view-visual" class="toggle-btn active">Visual</button>
+                                <button id="view-json" class="toggle-btn">JSON</button>
+                            </div>
+                            <span id="response-meta" class="meta-tag">Waiting...</span>
+                        </div>
+                    </div>
+
+                    <div class="response-area">
+                        <div class="response-area-inner">
+                            <div id="visual-response" class="visual-content">
+                                <div class="empty-state">
+                                    <div class="icon">🌐</div>
+                                    <h3>Ready to Test</h3>
+                                    <p>Test the API Gateway endpoints and service proxying</p>
+                                </div>
+                            </div>
+                            <pre id="tool-response" class="json-content"
+                                style="display: none;">Waiting for action...</pre>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

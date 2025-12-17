@@ -13,7 +13,8 @@ const CONFIG = {
         auth: { baseUrl: 'http://localhost:5002', name: 'Auth Service' },
         recommendation: { baseUrl: 'http://localhost:5001', name: 'Recommendation Service' },
         flow: { baseUrl: 'http://localhost:5004', name: 'Flow Service' },
-        comparison: { baseUrl: 'http://localhost:5005', name: 'Comparison Service' }
+        comparison: { baseUrl: 'http://localhost:5005', name: 'Comparison Service' },
+        gateway: { baseUrl: 'http://localhost:4000', name: 'API Gateway' }
     }
 };
 
@@ -83,7 +84,18 @@ const elements = {
     compareGetBtn: document.getElementById('compare-get-btn'),
     toolsArrayInput: document.getElementById('tools-array-input'),
     comparePostBtn: document.getElementById('compare-post-btn'),
-    popularBtn: document.getElementById('popular-btn')
+    popularBtn: document.getElementById('popular-btn'),
+
+    // Gateway Service
+    testServicesBtn: document.getElementById('test-services-btn'),
+    echoMethod: document.getElementById('echo-method'),
+    echoBtn: document.getElementById('echo-btn'),
+    authToken: document.getElementById('auth-token'),
+    protectedBtn: document.getElementById('protected-btn'),
+    proxyToolsBtn: document.getElementById('proxy-tools-btn'),
+    proxyFlowsBtn: document.getElementById('proxy-flows-btn'),
+    compareSlugs: document.getElementById('compare-slugs'),
+    proxyCompareBtn: document.getElementById('proxy-compare-btn')
 };
 
 // ====================================
@@ -964,6 +976,75 @@ function initComparisonServiceListeners() {
 }
 
 // ====================================
+// Event Listeners - Gateway Service
+// ====================================
+
+function initGatewayServiceListeners() {
+    // Health Check
+    if (elements.healthBtn) {
+        elements.healthBtn.addEventListener('click', async () => {
+            if (elements.healthStatus) {
+                elements.healthStatus.className = 'status-indicator status-loading';
+            }
+            const result = await fetchAPI(`${SERVICE_URL}/health`);
+            if (elements.healthStatus) {
+                elements.healthStatus.className = `status-indicator ${result.success ? 'status-success' : 'status-error'}`;
+            }
+        });
+    }
+
+    // Test Services
+    if (elements.testServicesBtn) {
+        elements.testServicesBtn.addEventListener('click', () => {
+            fetchAPI(`${SERVICE_URL}/test/services`);
+        });
+    }
+
+    // Echo Request
+    if (elements.echoBtn) {
+        elements.echoBtn.addEventListener('click', () => {
+            const method = elements.echoMethod?.value || 'GET';
+            fetchAPI(`${SERVICE_URL}/test/echo`, { method });
+        });
+    }
+
+    // Protected Test
+    if (elements.protectedBtn) {
+        elements.protectedBtn.addEventListener('click', () => {
+            const token = elements.authToken?.value.trim();
+            const options = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
+            fetchAPI(`${SERVICE_URL}/test/protected`, options);
+        });
+    }
+
+    // Proxy - Tools
+    if (elements.proxyToolsBtn) {
+        elements.proxyToolsBtn.addEventListener('click', () => {
+            fetchAPI(`${SERVICE_URL}/api/tools`);
+        });
+    }
+
+    // Proxy - Flows
+    if (elements.proxyFlowsBtn) {
+        elements.proxyFlowsBtn.addEventListener('click', () => {
+            fetchAPI(`${SERVICE_URL}/api/flows`);
+        });
+    }
+
+    // Proxy - Compare
+    if (elements.proxyCompareBtn) {
+        elements.proxyCompareBtn.addEventListener('click', () => {
+            const slugs = elements.compareSlugs?.value.trim();
+            if (!slugs) {
+                alert('Please enter tool slugs (comma-separated)');
+                return;
+            }
+            fetchAPI(`${SERVICE_URL}/api/compare?tools=${encodeURIComponent(slugs)}`);
+        });
+    }
+}
+
+// ====================================
 // Initialize
 // ====================================
 
@@ -992,6 +1073,9 @@ document.addEventListener('DOMContentLoaded', () => {
             break;
         case 'comparison':
             initComparisonServiceListeners();
+            break;
+        case 'gateway':
+            initGatewayServiceListeners();
             break;
     }
 

@@ -69,20 +69,23 @@ DecidrAI/
 #### 2. API Gateway (`apps/api-gateway/`) - Port 4000
 | Component | Status | Details |
 |-----------|--------|---------|
-| Express Setup | ✅ Done | CORS, JSON parsing |
+| Express Setup | ✅ Done | Helmet, CORS, JSON parsing |
 | Health Check | ✅ Done | `/health` endpoint |
 | Auth Middleware | ✅ Done | Clerk JWT validation |
-| Protected Route | ✅ Done | `/protected` test route |
+| Rate Limiting | ✅ Done | Default, AI, Auth limits |
+| Request Logger | ✅ Done | Colored console logging |
+| Error Handler | ✅ Done | Centralized with 404 |
+| Proxy Routes | ✅ Done | All services proxied |
+| Test Routes | ✅ Done | /test/services, /test/echo |
 
-**Files:**
-- `/apps/api-gateway/src/server.ts` - Main server
-- `/apps/api-gateway/src/middleware/auth.middleware.ts` - JWT validation using `@decidrai/auth`
-
-**Missing:**
-- Service routing (proxy to microservices)
-- Rate limiting
-- Request logging
-- Error handling middleware
+**API Routes:**
+| Route | Target Service | Auth |
+|-------|----------------|------|
+| `/api/tools/*` | tool-service:5003 | Admin: Yes |
+| `/api/flows/*` | flow-service:5004 | Admin: Yes |
+| `/api/compare/*` | comparison-service:5005 | No |
+| `/api/recommend/*` | recommendation-service:5001 | No |
+| `/api/auth/*` | auth-service:5002 | Varies |
 
 ---
 
@@ -309,7 +312,7 @@ Interactive HTML/JS testing UI for all services.
 | Redis Connection | ✅ Complete | 100% |
 | **Apps** | | |
 | Frontend (Next.js) | 🚧 Partial | 40% |
-| API Gateway | 🚧 Partial | 50% |
+| API Gateway | ✅ Complete | 100% |
 | **Services** | | |
 | Auth Service | ✅ Complete | 100% |
 | Tool Service | ✅ Complete | 100% |
