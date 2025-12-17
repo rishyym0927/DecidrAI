@@ -20,7 +20,7 @@ DecidrAI/
 │   ├── tool-service/          # ✅ Tool CRUD + Search - Port 5003
 │   ├── recommendation-service/ # 🚧 Basic structure only - Port 5001
 │   ├── flow-service/          # ✅ Flow engine + Sessions - Port 5004
-│   ├── comparison-service/    # ❌ Empty (Planned)
+│   ├── comparison-service/    # ✅ AI comparisons - Port 5005
 │   └── analytics-service/     # ❌ Empty (Planned)
 ├── packages/                  # Shared libraries
 │   ├── db/                    # ✅ MongoDB + Redis clients
@@ -221,8 +221,22 @@ DecidrAI/
 ### ❌ **SERVICES - NOT IMPLEMENTED**
 
 
-#### 7. Comparison Service (`services/comparison-service/`)
-**Status:** Empty directory
+#### 7. Comparison Service (`services/comparison-service/`) - Port 5005
+| Component | Status | Details |
+|-----------|--------|---------|
+| Express Server | ✅ Done | Health check with MongoDB/Redis/Gemini status |
+| Comparison Model | ✅ Done | Winner scenarios, feature comparison, caching |
+| Gemini AI Generator | ✅ Done | AI-powered comparison generation |
+| Cross-Service | ✅ Done | Fetches tools from tool-service |
+| Cache Service | ✅ Done | Redis + MongoDB caching (7-day TTL) |
+
+**API Endpoints:**
+| Method | Endpoint | Status |
+|--------|----------|--------|
+| GET | `/health` | ✅ With Gemini status |
+| GET | `/compare?tools=slug1,slug2` | ✅ Get/generate comparison |
+| POST | `/compare` | ✅ Force regenerate |
+| GET | `/compare/popular` | ✅ Popular comparisons |
 
 ---
 
@@ -301,7 +315,7 @@ Interactive HTML/JS testing UI for all services.
 | Tool Service | ✅ Complete | 100% |
 | Recommendation Service | ✅ Complete | 100% |
 | Flow Service | ✅ Complete | 100% |
-| Comparison Service | ❌ Not Started | 0% |
+| Comparison Service | ✅ Complete | 100% |
 | Analytics Service | ❌ Not Started | 0% |
 | **Packages** | | |
 | DB Package | ✅ Complete | 100% |
