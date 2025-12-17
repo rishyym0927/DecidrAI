@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import { connectMongo } from 'db';
 import { getRedisClient } from 'db';
 import toolRoutes from './routes/tool.routes';
+import { createRequestLogger } from 'logger';
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ const PORT = process.env.PORT || 5003;
 
 app.use(helmet());
 app.use(cors());
+app.use(createRequestLogger('tool-service'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
