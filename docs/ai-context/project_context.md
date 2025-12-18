@@ -14,11 +14,11 @@
 DecidrAI/
 ├── apps/
 │   ├── frontend/              # Next.js 14 (App Router) - Port 3000
-│   └── api-gateway/           # Express gateway - Port 4000
+│   └── api-gateway/           # ✅ Express gateway - Port 4000
 ├── services/                  # Microservices
 │   ├── auth-service/          # ✅ Clerk auth + MongoDB sync - Port 5002
 │   ├── tool-service/          # ✅ Tool CRUD + Search - Port 5003
-│   ├── recommendation-service/ # 🚧 Basic structure only - Port 5001
+│   ├── recommendation-service/ # ✅ Tag scoring + AI Explainers - Port 5001
 │   ├── flow-service/          # ✅ Flow engine + Sessions - Port 5004
 │   ├── comparison-service/    # ✅ AI comparisons - Port 5005
 │   └── analytics-service/     # ❌ Empty (Planned)
@@ -26,9 +26,9 @@ DecidrAI/
 │   ├── db/                    # ✅ MongoDB + Redis clients
 │   ├── auth/                  # ✅ Clerk utilities (session validation, guards)
 │   ├── config/                # ❌ Empty (Planned)
-│   ├── errors/                # ❌ Empty (Planned)
-│   ├── logger/                # ❌ Empty (Planned)
-│   ├── types/                 # ❌ Empty (Planned)
+│   ├── errors/                # ✅ Standardized Error Classes
+│   ├── logger/                # ✅ Shared Logging Logic
+│   ├── types/                 # ✅ Shared Types
 │   └── schemas/               # ❌ Empty (Planned)
 ├── api-playground/            # ✅ Interactive API testing UI
 ├── docs/                      # ✅ Documentation
@@ -126,14 +126,12 @@ DecidrAI/
 
 **Files:**
 - `/services/tool-service/src/index.ts` - Server entry
-- `/services/tool-service/src/models/Tool.ts` - Full Mongoose schema (266 lines)
-- `/services/tool-service/src/controllers/tool.controller.ts` - All CRUD (375 lines)
+- `/services/tool-service/src/models/Tool.ts` - Full Mongoose schema
+- `/services/tool-service/src/controllers/tool.controller.ts` - All CRUD
 - `/services/tool-service/src/routes/tool.routes.ts` - Route definitions
 - `/services/tool-service/src/services/cache.service.ts` - Redis caching
 - `/services/tool-service/src/services/search.service.ts` - MongoDB text search
 - `/services/tool-service/src/scripts/seed.ts` - 10 sample tools
-- `/services/tool-service/src/utils/slugify.ts` - URL slug generator
-- `/services/tool-service/src/utils/asyncHandler.ts` - Async error wrapper
 
 **API Endpoints:**
 | Method | Endpoint | Status |
@@ -147,8 +145,6 @@ DecidrAI/
 | DELETE | `/admin/tools/:id` | ✅ Soft delete (archive) |
 
 ---
-
-### 🚧 **SERVICES - PARTIAL**
 
 #### 5. Recommendation Service (`services/recommendation-service/`) - Port 5001
 | Component | Status | Details |
@@ -166,9 +162,6 @@ DecidrAI/
 - `/services/recommendation-service/src/ranking/ranking.ts` - Ranking utilities
 - `/services/recommendation-service/src/explainers/explainer.ts` - Gemini AI
 - `/services/recommendation-service/src/services/recommendation.service.ts` - Orchestration
-- `/services/recommendation-service/src/services/cache.service.ts` - Redis caching
-- `/services/recommendation-service/src/controllers/recommendation.controller.ts`
-- `/services/recommendation-service/src/routes/recommendation.routes.ts`
 
 **API Endpoints:**
 | Method | Endpoint | Status |
@@ -199,12 +192,7 @@ DecidrAI/
 - `/services/flow-service/src/models/Flow.ts` - Flow schema with questions
 - `/services/flow-service/src/models/FlowSession.ts` - Session tracking
 - `/services/flow-service/src/controllers/flow.controller.ts` - All endpoints
-- `/services/flow-service/src/routes/flow.routes.ts` - Route definitions
-- `/services/flow-service/src/services/cache.service.ts` - Redis caching
 - `/services/flow-service/src/services/flow.service.ts` - Business logic
-- `/services/flow-service/src/engine/questionEngine.ts` - Question logic
-- `/services/flow-service/src/scoring/scoring.ts` - Scoring algorithms
-- `/services/flow-service/src/scripts/seed.ts` - 5 sample flows
 
 **API Endpoints:**
 | Method | Endpoint | Status |
@@ -220,9 +208,6 @@ DecidrAI/
 | DELETE | `/admin/flows/:id` | ✅ Soft delete (archive) |
 
 ---
-
-### ❌ **SERVICES - NOT IMPLEMENTED**
-
 
 #### 7. Comparison Service (`services/comparison-service/`) - Port 5005
 | Component | Status | Details |
@@ -243,8 +228,10 @@ DecidrAI/
 
 ---
 
+### ❌ **SERVICES - NOT IMPLEMENTED**
+
 #### 8. Analytics Service (`services/analytics-service/`)
-**Status:** Empty directory
+**Status:** Empty directory (Planned)
 
 ---
 
@@ -257,13 +244,6 @@ DecidrAI/
 | Redis Client | ✅ Done | `getRedisClient()` singleton |
 | Exports | ✅ Done | Published as `db` package |
 
-**Files:**
-- `/packages/db/src/mongo.ts` - Mongoose connection
-- `/packages/db/src/redis.ts` - ioredis client
-- `/packages/db/src/index.ts` - Combined exports
-
----
-
 #### 10. Auth Package (`packages/auth/`)
 | Component | Status | Details |
 |-----------|--------|---------|
@@ -271,25 +251,37 @@ DecidrAI/
 | Internal Auth Guard | ✅ Done | `requireInternalAuth()` for service-to-service |
 | Exports | ✅ Done | Published as `@decidrai/auth` |
 
-**Files:**
-- `/packages/auth/src/session.ts` - Clerk token verification
-- `/packages/auth/src/guard.ts` - Service secret validation
-- `/packages/auth/src/index.ts` - Combined exports
+#### 11. Logger Package (`packages/logger/`)
+| Component | Status | Details |
+|-----------|--------|---------|
+| Logger | ✅ Done | Winston/Bunyan based logger |
+| Request Logger | ✅ Done | Middleware for Express |
+| Exports | ✅ Done | Published as `logger` |
+
+#### 12. Errors Package (`packages/errors/`)
+| Component | Status | Details |
+|-----------|--------|---------|
+| AppError | ✅ Done | Base error class |
+| HttpErrors | ✅ Done | NotFound, Unauthorized, BadRequest etc. |
+| Exports | ✅ Done | Published as `errors` |
+
+#### 13. Types Package (`packages/types/`)
+| Component | Status | Details |
+|-----------|--------|---------|
+| Shared Types | ✅ Done | Common interfaces and types |
+| Exports | ✅ Done | Published as `types` |
 
 ---
 
 ### ❌ **PACKAGES - NOT IMPLEMENTED**
 - `packages/config/` - Empty
-- `packages/errors/` - Empty
-- `packages/logger/` - Empty
-- `packages/types/` - Empty
 - `packages/schemas/` - Empty
 
 ---
 
 ### ✅ **EXTRAS - IMPLEMENTED**
 
-#### 11. API Playground (`api-playground/`)
+#### 14. API Playground (`api-playground/`)
 Interactive HTML/JS testing UI for all services.
 
 **Files:**
@@ -323,42 +315,35 @@ Interactive HTML/JS testing UI for all services.
 | **Packages** | | |
 | DB Package | ✅ Complete | 100% |
 | Auth Package | ✅ Complete | 100% |
+| Logger Package | ✅ Complete | 100% |
+| Errors Package | ✅ Complete | 100% |
+| Types Package | ✅ Complete | 100% |
 | Config Package | ❌ Not Started | 0% |
-| Logger Package | ❌ Not Started | 0% |
-| Types Package | ❌ Not Started | 0% |
 | Schemas Package | ❌ Not Started | 0% |
-| Errors Package | ❌ Not Started | 0% |
 
 ---
 
 ## 🎯 NEXT STEPS (Recommended Order)
 
 ### Immediate Priority
-1. **Complete Recommendation Service**
-   - Connect to Flow Service for tag extraction
-   - Implement scoring algorithm using extracted tags
-   - Add OpenAI explanation generation
+1. **Frontend Flow UI**
+   - Implement Flow Questionnaire pages
+   - Add OpenAI explanation display
    
-2. **Frontend Flow UI**
-   - Add OpenAI explanation generation
-
-### Secondary Priority
-3. **Frontend Tool Pages**
+2. **Frontend Tool Pages**
    - Tool detail page (`/tools/[slug]`)
    - Category pages
    - Search UI
 
-4. **API Gateway Routing**
-   - Proxy requests to services
-   - Add rate limiting
+### Secondary Priority
+3. **Admin Panel**
+   - Tool management UI
+   - Flow management UI
 
-### Nice to Have
-5. **Admin Panel** - Tool management UI
-6. **Comparison Service** - Side-by-side analysis
-7. **Analytics Service** - User tracking
+4. **Analytics Service**
+   - Implement user tracking
 
 ---
-
 
 ## 🌐 Environment Variables
 
@@ -386,15 +371,12 @@ Interactive HTML/JS testing UI for all services.
 ---
 
 ## 🐛 Known Issues / Tech Debt
-- [ ] No centralized error handling
-- [ ] No shared types package (duplicated types across services)
-- [ ] No logging infrastructure
-- [ ] No tests written
-- [ ] API Gateway doesn't route to services yet
-- [ ] Frontend uses mock data for tools (not connected to API)
-- [ ] Missing input validation (Zod schemas)
+- [ ] No centralized input validation (Zod schemas package is empty)
+- [ ] Frontend uses mock data for some components (not fully connected to API)
+- [ ] Analytics Service is missing
+- [ ] Tests are missing
 
 ---
 
-**Last Updated:** 2025-12-17  
-**Version:** 2.0 (Major revision - accurate implementation status)
+**Last Updated:** 2025-12-18
+**Version:** 2.1 (Updated implementation status)
