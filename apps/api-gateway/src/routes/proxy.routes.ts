@@ -77,6 +77,10 @@ async function proxyRequest(
 router.get('/tools', (req, res) =>
     proxyRequest(req, res, SERVICES.tool.url, '/tools'));
 
+// Search route MUST come before :slug route
+router.get('/tools/search', (req, res) =>
+    proxyRequest(req, res, SERVICES.tool.url, '/tools/search'));
+
 router.get('/tools/:slug', (req, res) =>
     proxyRequest(req, res, SERVICES.tool.url, `/tools/${req.params.slug}`));
 

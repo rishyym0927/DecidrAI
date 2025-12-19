@@ -1,66 +1,52 @@
 /**
  * Tools Filter Component
- * Filters for category, pricing, and sorting
+ * Matches backend filter query params: category, price, learning_curve, sort
  */
 
 'use client';
 
-import { useState } from 'react';
-
 interface ToolsFilterProps {
   onFilterChange: (filters: {
     category?: string;
-    pricing?: string;
+    price?: string;
     sort?: string;
   }) => void;
+  currentFilters: {
+    category?: string;
+    price?: string;
+    sort?: string;
+  };
 }
 
-export default function ToolsFilter({ onFilterChange }: ToolsFilterProps) {
-  const [category, setCategory] = useState('');
-  const [pricing, setPricing] = useState('');
-  const [sort, setSort] = useState('popular');
-
+export default function ToolsFilter({ onFilterChange, currentFilters }: ToolsFilterProps) {
+  // Categories from backend data
   const categories = [
-    'All Categories',
-    'Content Creation',
-    'Design & Art',
-    'Development',
-    'Marketing',
-    'Productivity',
-    'Video & Audio',
-    'Research',
-    'Customer Support',
+    { value: '', label: 'All Categories' },
+    { value: 'productivity', label: 'Productivity' },
+    { value: 'writing', label: 'Writing' },
+    { value: 'marketing', label: 'Marketing' },
+    { value: 'design', label: 'Design' },
+    { value: 'creativity', label: 'Creativity' },
+    { value: 'video', label: 'Video' },
+    { value: 'audio', label: 'Audio' },
+    { value: 'collaboration', label: 'Collaboration' },
   ];
 
+  // Pricing models from backend
   const pricingOptions = [
-    'All Pricing',
-    'Free',
-    'Freemium',
-    'Paid',
+    { value: '', label: 'All Pricing' },
+    { value: 'free', label: 'Free' },
+    { value: 'freemium', label: 'Freemium' },
+    { value: 'paid', label: 'Paid' },
   ];
 
+  // Sort options matching backend
   const sortOptions = [
+    { value: 'newest', label: 'Newest' },
     { value: 'popular', label: 'Most Popular' },
-    { value: 'newest', label: 'Newest First' },
-    { value: 'name', label: 'Name (A-Z)' },
+    { value: 'price-low', label: 'Price: Low' },
+    { value: 'price-high', label: 'Price: High' },
   ];
-
-  const handleCategoryChange = (value: string) => {
-    const newCategory = value === 'All Categories' ? '' : value;
-    setCategory(newCategory);
-    onFilterChange({ category: newCategory, pricing, sort });
-  };
-
-  const handlePricingChange = (value: string) => {
-    const newPricing = value === 'All Pricing' ? '' : value;
-    setPricing(newPricing);
-    onFilterChange({ category, pricing: newPricing, sort });
-  };
-
-  const handleSortChange = (value: string) => {
-    setSort(value);
-    onFilterChange({ category, pricing, sort: value });
-  };
 
   return (
     <div className="border border-[var(--border)] rounded-2xl p-6 bg-[var(--background)] mb-8">
@@ -69,13 +55,13 @@ export default function ToolsFilter({ onFilterChange }: ToolsFilterProps) {
         <div>
           <label className="block text-sm font-semibold mb-2">Category</label>
           <select
-            value={category || 'All Categories'}
-            onChange={(e) => handleCategoryChange(e.target.value)}
+            value={currentFilters.category || ''}
+            onChange={(e) => onFilterChange({ ...currentFilters, category: e.target.value || undefined })}
             className="w-full px-4 py-2 border border-[var(--border)] rounded-lg bg-[var(--background)] text-[var(--foreground)]"
           >
             {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
+              <option key={cat.value} value={cat.value}>
+                {cat.label}
               </option>
             ))}
           </select>
@@ -85,13 +71,13 @@ export default function ToolsFilter({ onFilterChange }: ToolsFilterProps) {
         <div>
           <label className="block text-sm font-semibold mb-2">Pricing</label>
           <select
-            value={pricing || 'All Pricing'}
-            onChange={(e) => handlePricingChange(e.target.value)}
+            value={currentFilters.price || ''}
+            onChange={(e) => onFilterChange({ ...currentFilters, price: e.target.value || undefined })}
             className="w-full px-4 py-2 border border-[var(--border)] rounded-lg bg-[var(--background)] text-[var(--foreground)]"
           >
-            {pricingOptions.map((price) => (
-              <option key={price} value={price}>
-                {price}
+            {pricingOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
               </option>
             ))}
           </select>
@@ -101,13 +87,13 @@ export default function ToolsFilter({ onFilterChange }: ToolsFilterProps) {
         <div>
           <label className="block text-sm font-semibold mb-2">Sort By</label>
           <select
-            value={sort}
-            onChange={(e) => handleSortChange(e.target.value)}
+            value={currentFilters.sort || 'newest'}
+            onChange={(e) => onFilterChange({ ...currentFilters, sort: e.target.value })}
             className="w-full px-4 py-2 border border-[var(--border)] rounded-lg bg-[var(--background)] text-[var(--foreground)]"
           >
-            {sortOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
+            {sortOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
               </option>
             ))}
           </select>
