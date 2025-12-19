@@ -1,19 +1,36 @@
-import HeroSection from "@/components/home/HeroSection";
-import DiscoveryFlowsSection from "@/components/home/DiscoveryFlowsSection";
-import CategoriesSection from "@/components/home/CategoriesSection";
-import FeaturedToolsSection from "@/components/home/FeaturedToolsSection";
-import CTASection from "@/components/home/CTASection";
-import Footer from "@/components/layout/Footer";
+/**
+ * Homepage
+ * Main landing page with hero, features, and CTA
+ */
 
-export default function Home() {
+'use client';
+
+export default function HomePage() {
   return (
-    <main className="min-h-screen bg-white dark:bg-black">
-      <HeroSection />
-      <DiscoveryFlowsSection />
-      <CategoriesSection />
-      <FeaturedToolsSection />
-      <CTASection />
-      <Footer />
-    </main>
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="container mx-auto px-4 py-20">
+        <h1 className="text-5xl font-bold text-center mb-6">
+          Find the Perfect AI Tool
+        </h1>
+        <p className="text-xl text-center text-gray-600 dark:text-gray-400 mb-8">
+          Answer a few questions, get personalized recommendations
+        </p>
+      </section>
+
+      {/* Features Section */}
+      <section className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold mb-8">How It Works</h2>
+        {/* Add features */}
+      </section>
+
+      {/* CTA Section */}
+      <section className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold text-center mb-8">
+          Ready to Discover?
+        </h2>
+        {/* Add CTA buttons */}
+      </section>
+    </div>
   );
 }

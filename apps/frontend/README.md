@@ -6,7 +6,8 @@
 
 ## 📖 Documentation
 
-- **[DEVELOPER_GUIDE.md](./DEVELOPER_GUIDE.md)** ← **START HERE** - Everything you need to build pages
+- **[PAGES.md](./PAGES.md)** ← **ALL PAGE STRUCTURES** - Complete list of all 19 pages
+- **[DEVELOPER_GUIDE.md](./DEVELOPER_GUIDE.md)** - Everything you need to build pages
 - **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** - Cheat sheet for quick lookups
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Detailed architecture explanation
 
