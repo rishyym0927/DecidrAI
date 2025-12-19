@@ -1,41 +1,102 @@
-import { discoveryFlows } from "@/data/discoveryFlows";
+/**
+ * Discovery Flows Section
+ * Highlights the discovery flow feature
+ */
+
+import Link from 'next/link';
 
 export default function DiscoveryFlowsSection() {
-  return (
-    <section className="py-20 px-6 lg:px-8 bg-neutral-50 dark:bg-neutral-950">
-      <div className="max-w-6xl mx-auto">
-        <div className="max-w-2xl mb-12">
-          <p className="text-sm font-medium text-neutral-500 uppercase tracking-widest mb-3">
-            Guided Discovery
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-serif font-medium text-black dark:text-white mb-4">
-            Find your perfect match
-          </h2>
-          <p className="text-neutral-600 dark:text-neutral-400 text-lg">
-            Answer a few questions to get AI-powered recommendations tailored to your needs.
-          </p>
-        </div>
+  const flows = [
+    {
+      title: 'Content Creation Flow',
+      slug: 'content-creation',
+      description: 'Find the perfect tool for writing, blogging, or creating content',
+      icon: '✍️',
+      questions: 5,
+      time: '2 min',
+      color: 'bg-blue-500',
+    },
+    {
+      title: 'Design Assistant Finder',
+      slug: 'design-assistant',
+      description: 'Discover AI tools for graphic design, image generation, and more',
+      icon: '🎨',
+      questions: 6,
+      time: '3 min',
+      color: 'bg-purple-500',
+    },
+    {
+      title: 'Developer Tools Guide',
+      slug: 'developer-tools',
+      description: 'Get matched with coding assistants and development tools',
+      icon: '💻',
+      questions: 7,
+      time: '3 min',
+      color: 'bg-green-500',
+    },
+  ];
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {discoveryFlows.map((flow) => (
-            <article
-              key={flow.id}
-              className="group bg-white dark:bg-black rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 hover:border-black dark:hover:border-white transition-all cursor-pointer"
+  return (
+    <section className="py-20 md:py-32 bg-[var(--background)]">
+      <div className="container mx-auto px-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Section Header */}
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Try Our Discovery Flows
+            </h2>
+            <p className="text-xl text-[var(--muted)] max-w-2xl mx-auto">
+              Answer a few questions and get personalized recommendations
+            </p>
+          </div>
+
+          {/* Flows Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {flows.map((flow) => (
+              <Link
+                key={flow.slug}
+                href={`/discover/${flow.slug}`}
+                className="group border border-[var(--border)] rounded-2xl p-6 hover:border-[var(--foreground)] transition-all hover-lift bg-[var(--background)]"
+              >
+                {/* Icon */}
+                <div className={`inline-flex items-center justify-center w-16 h-16 ${flow.color} rounded-xl mb-4 text-3xl`}>
+                  {flow.icon}
+                </div>
+
+                {/* Title */}
+                <h3 className="text-xl font-bold mb-3 group-hover:underline">
+                  {flow.title}
+                </h3>
+
+                {/* Description */}
+                <p className="text-[var(--muted)] mb-4 leading-relaxed">
+                  {flow.description}
+                </p>
+
+                {/* Meta Info */}
+                <div className="flex items-center gap-4 text-sm text-[var(--muted)]">
+                  <div className="flex items-center gap-1">
+                    <span>❓</span>
+                    <span>{flow.questions} questions</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span>⏱️</span>
+                    <span>{flow.time}</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* View All Link */}
+          <div className="text-center mt-12">
+            <Link
+              href="/discover"
+              className="inline-block text-lg font-semibold hover:underline"
             >
-              <div className="text-4xl mb-5">{flow.icon}</div>
-              <h3 className="text-lg font-semibold text-black dark:text-white mb-2 group-hover:underline underline-offset-4">
-                {flow.title}
-              </h3>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-5 leading-relaxed">
-                {flow.description}
-              </p>
-              <div className="flex items-center gap-2 text-xs text-neutral-500">
-                <span>{flow.questions} questions</span>
-                <span>·</span>
-                <span>{flow.timeEstimate}</span>
-              </div>
-            </article>
-          ))}
+              View All Discovery Flows →
+            </Link>
+          </div>
         </div>
       </div>
     </section>

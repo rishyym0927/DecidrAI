@@ -1,73 +1,58 @@
-"use client";
+/**
+ * Hero Section Component
+ * Main headline and CTA for the homepage
+ */
 
-import { useState } from "react";
-import { SearchIcon, ArrowRightIcon } from "../ui/icons";
+import Link from 'next/link';
 
 export default function HeroSection() {
-  const [searchQuery, setSearchQuery] = useState("");
-
   return (
-    <section className="pt-32 pb-20 px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto text-center">
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-100 dark:bg-neutral-900 text-sm text-neutral-600 dark:text-neutral-400 mb-8">
-          <span className="w-2 h-2 rounded-full bg-green-500"></span>
-          Curated AI tools, served fresh
-        </div>
+    <section className="border-b border-[var(--border)] bg-[var(--background)]">
+      <div className="container mx-auto px-4 py-20 md:py-32">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Main Headline */}
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+            The Google for
+            <br />
+            <span className="italic">AI Decisions</span>
+          </h1>
 
-        {/* Main Heading - Medium style large serif */}
-        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-serif font-medium text-black dark:text-white mb-6 leading-[1.1] tracking-tight">
-          Find the right AI tool.
-          <br />
-          <span className="text-neutral-400 dark:text-neutral-600">Not all of them.</span>
-        </h1>
+          {/* Subheadline */}
+          <p className="text-xl md:text-2xl text-[var(--muted)] mb-12 max-w-2xl mx-auto">
+            Stop endless searching. Answer a few questions, get personalized AI tool 
+            recommendations that actually fit your needs.
+          </p>
 
-        {/* Subtitle */}
-        <p className="text-lg sm:text-xl text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-          Stop scrolling through endless directories. Answer a few questions and 
-          get personalized recommendations in minutes.
-        </p>
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link
+              href="/discover"
+              className="px-8 py-4 bg-[var(--foreground)] text-[var(--background)] rounded-full font-semibold text-lg hover:opacity-80 transition-opacity w-full sm:w-auto text-center"
+            >
+              Start Discovery
+            </Link>
+            <Link
+              href="/tools"
+              className="px-8 py-4 border-2 border-[var(--foreground)] text-[var(--foreground)] rounded-full font-semibold text-lg hover:bg-[var(--surface)] transition-colors w-full sm:w-auto text-center"
+            >
+              Browse Tools
+            </Link>
+          </div>
 
-        {/* Search Bar */}
-        <div className="max-w-xl mx-auto mb-10">
-          <div className="relative">
-            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-neutral-400">
-              <SearchIcon />
+          {/* Trust Indicators */}
+          <div className="mt-16 flex flex-wrap justify-center items-center gap-8 text-sm text-[var(--muted)]">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">✨</span>
+              <span>AI-Powered</span>
             </div>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search 500+ AI tools..."
-              className="w-full pl-14 pr-6 py-4 rounded-full bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-black dark:text-white placeholder:text-neutral-400 focus:outline-none focus:border-black dark:focus:border-white transition-colors text-base"
-            />
-          </div>
-        </div>
-
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-black dark:bg-white text-white dark:text-black font-medium rounded-full hover:opacity-80 transition-opacity text-base">
-            Start Discovery
-            <ArrowRightIcon />
-          </button>
-          <button className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-black dark:text-white font-medium rounded-full border border-neutral-200 dark:border-neutral-800 hover:border-black dark:hover:border-white transition-colors text-base">
-            Browse Tools
-          </button>
-        </div>
-
-        {/* Stats - minimalist */}
-        <div className="flex flex-wrap justify-center gap-12 mt-16 pt-16 border-t border-neutral-100 dark:border-neutral-900">
-          <div className="text-center">
-            <div className="text-3xl font-semibold text-black dark:text-white mb-1">500+</div>
-            <div className="text-sm text-neutral-500">Curated Tools</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-semibold text-black dark:text-white mb-1">50+</div>
-            <div className="text-sm text-neutral-500">Categories</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-semibold text-black dark:text-white mb-1">10k+</div>
-            <div className="text-sm text-neutral-500">Users</div>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🎯</span>
+              <span>Intent-Based</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">⚡</span>
+              <span>Fast & Simple</span>
+            </div>
           </div>
         </div>
       </div>

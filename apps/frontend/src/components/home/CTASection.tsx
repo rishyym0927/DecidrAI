@@ -1,20 +1,37 @@
-import { ArrowRightIcon } from "../ui/icons";
+/**
+ * Final CTA Section
+ * Encourages users to start their discovery journey
+ */
+
+import Link from 'next/link';
 
 export default function CTASection() {
   return (
-    <section className="py-20 px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto text-center">
-        <div className="bg-white dark:bg-black rounded-3xl p-12 sm:p-16 border border-neutral-200 dark:border-neutral-800">
-          <h2 className="text-3xl sm:text-4xl font-serif font-medium text-black dark:text-white mb-4">
-            Ready to find your AI stack?
+    <section className="py-20 md:py-32 bg-[var(--foreground)] text-[var(--background)]">
+      <div className="container mx-auto px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Headline */}
+          <h2 className="text-4xl md:text-6xl font-bold mb-6">
+            Ready to Find Your Perfect AI Tool?
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-8 max-w-md mx-auto">
-            Get personalized recommendations in under 3 minutes.
+
+          {/* Subheadline */}
+          <p className="text-xl md:text-2xl mb-12 opacity-80">
+            Join thousands of users who've discovered the right tools for their needs
           </p>
-          <button className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-black dark:bg-white text-white dark:text-black font-medium rounded-full hover:opacity-80 transition-opacity text-base">
-            Start Free Discovery
-            <ArrowRightIcon />
-          </button>
+
+          {/* CTA Button */}
+          <Link
+            href="/discover"
+            className="inline-block px-10 py-5 bg-[var(--background)] text-[var(--foreground)] rounded-full font-bold text-lg hover:opacity-90 transition-opacity"
+          >
+            Start Your Discovery Journey
+          </Link>
+
+          {/* Additional Info */}
+          <p className="mt-8 text-sm opacity-70">
+            No credit card required • Free to use • Takes less than 3 minutes
+          </p>
         </div>
       </div>
     </section>
