@@ -5,17 +5,11 @@
 
 'use client';
 
+import type { ToolFilters } from '@/types/tool';
+
 interface ToolsFilterProps {
-  onFilterChange: (filters: {
-    category?: string;
-    price?: string;
-    sort?: string;
-  }) => void;
-  currentFilters: {
-    category?: string;
-    price?: string;
-    sort?: string;
-  };
+  onFilterChange: (filters: Partial<ToolFilters>) => void;
+  currentFilters: ToolFilters;
 }
 
 export default function ToolsFilter({ onFilterChange, currentFilters }: ToolsFilterProps) {
@@ -88,7 +82,7 @@ export default function ToolsFilter({ onFilterChange, currentFilters }: ToolsFil
           <label className="block text-sm font-semibold mb-2">Sort By</label>
           <select
             value={currentFilters.sort || 'newest'}
-            onChange={(e) => onFilterChange({ ...currentFilters, sort: e.target.value })}
+            onChange={(e) => onFilterChange({ ...currentFilters, sort: e.target.value as ToolFilters['sort'] })}
             className="w-full px-4 py-2 border border-[var(--border)] rounded-lg bg-[var(--background)] text-[var(--foreground)]"
           >
             {sortOptions.map((opt) => (
