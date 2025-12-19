@@ -7,7 +7,7 @@ import {
   SignedOut,
   UserButton,
 } from '@clerk/nextjs'
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const navLinks = [
   { name: 'Discover', href: '/discover' },

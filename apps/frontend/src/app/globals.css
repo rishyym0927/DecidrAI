@@ -1,51 +1,36 @@
 @import "tailwindcss";
 
+/* Enable dark mode with .dark class selector (Tailwind v4) */
+@variant dark (&:where(.dark, .dark *));
+
 /* ============================================
-   DECIDR AI - Design Tokens
+   DECIDR AI - Medium-Inspired Design System
 ============================================ */
 
 :root {
-  /* Light Mode */
+  /* Light Mode - Clean whites */
   --background: #ffffff;
-  --foreground: #09090b;
-  --surface: #f4f4f5;
+  --foreground: #000000;
+  --surface: #fafafa;
   --surface-elevated: #ffffff;
-  --muted: #71717a;
-  --border: #e4e4e7;
-
-  /* Accent - Violet */
-  --accent: #8b5cf6;
-  --accent-hover: #7c3aed;
+  --muted: #6b6b6b;
+  --border: #e5e5e5;
 }
 
 .dark {
-  /* Pure Black Dark Mode */
+  /* Dark Mode - Pure blacks */
   --background: #000000;
-  --foreground: #fafafa;
+  --foreground: #ffffff;
   --surface: #0a0a0a;
-  --surface-elevated: #141414;
-  --muted: #a1a1aa;
-  --border: #27272a;
-
-  --accent: #a78bfa;
-  --accent-hover: #8b5cf6;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
-  --color-surface-elevated: var(--surface-elevated);
-  --color-muted: var(--muted);
-  --color-border: var(--border);
-  --color-accent: var(--accent);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --surface-elevated: #0f0f0f;
+  --muted: #a0a0a0;
+  --border: #1a1a1a;
 }
 
 /* ============================================
-   BASE STYLES
+   TYPOGRAPHY - Medium-inspired
 ============================================ */
+
 
 html {
   scroll-behavior: smooth;
@@ -54,99 +39,33 @@ html {
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Serif headings - Medium style */
+.font-serif {
+  font-family: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
 }
 
 /* ============================================
-   ANIMATIONS
+   FOCUS STATES - Clean outlines
 ============================================ */
 
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+*:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-8px);
-  }
-}
-
-@keyframes glow {
-
-  0%,
-  100% {
-    opacity: 0.4;
-  }
-
-  50% {
-    opacity: 0.8;
-  }
-}
-
-.animate-fade-in-up {
-  animation: fade-in-up 0.5s ease-out forwards;
-}
-
-.animate-fade-in {
-  animation: fade-in 0.4s ease-out forwards;
-}
-
-.animate-float {
-  animation: float 4s ease-in-out infinite;
-}
-
-.animate-glow {
-  animation: glow 3s ease-in-out infinite;
-}
-
-/* Stagger delays */
-.delay-100 {
-  animation-delay: 100ms;
-}
-
-.delay-200 {
-  animation-delay: 200ms;
-}
-
-.delay-300 {
-  animation-delay: 300ms;
-}
-
-.delay-400 {
-  animation-delay: 400ms;
-}
-
-.delay-500 {
-  animation-delay: 500ms;
+input:focus-visible,
+button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--foreground);
 }
 
 /* ============================================
-   SCROLLBAR
+   SCROLLBAR - Minimal
 ============================================ */
 
 ::-webkit-scrollbar {
@@ -155,7 +74,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--surface);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -167,7 +86,54 @@ body {
   background: var(--muted);
 }
 
+/* Firefox scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* ============================================
+   SELECTION - Clean and subtle
+============================================ */
+
 ::selection {
-  background-color: rgba(139, 92, 246, 0.2);
-  color: var(--foreground);
+  background-color: rgba(0, 0, 0, 0.1);
+  color: inherit;
+}
+
+.dark ::selection {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================
+   LINK UNDERLINES - Medium style
+============================================ */
+
+.underline-offset-4 {
+  text-underline-offset: 4px;
+}
+
+/* ============================================
+   UTILITIES
+============================================ */
+
+/* Subtle hover lift for cards */
+.hover-lift {
+  transition: transform 200ms ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* Text balance for better wrapping */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+/* Prevent layout shift from scrollbar */
+html {
+  overflow-y: scroll;
 }
