@@ -19,6 +19,7 @@ export function getRedisClient() {
       options.password = process.env.REDIS_TOKEN;
     }
 
+    console.log(`[Redis] Connecting to ${process.env.REDIS_URL?.replace(/:[^:@]*@/, ':****@')}`);
     redis = new Redis(process.env.REDIS_URL, options);
     redis.on('error', (err) => {
       console.error('Redis connection error:', err);
