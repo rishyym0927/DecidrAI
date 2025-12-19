@@ -60,7 +60,7 @@ services:
     env: node
     plan: free
     buildCommand: pnpm install && pnpm turbo run build --filter=auth-service
-    startCommand: node services/auth-service/dist/index.js
+    startCommand: node services/auth-service/dist/services/auth-service/src/index.js
     envVars:
       - key: MONGODB_URI
         sync: false
@@ -77,7 +77,7 @@ services:
     env: node
     plan: free
     buildCommand: pnpm install && pnpm turbo run build --filter=tool-service
-    startCommand: node services/tool-service/dist/index.js
+    startCommand: node services/tool-service/dist/services/tool-service/src/index.js
     envVars:
       - key: MONGODB_URI
         sync: false
@@ -92,7 +92,7 @@ services:
     env: node
     plan: free
     buildCommand: pnpm install && pnpm turbo run build --filter=recommendation-service
-    startCommand: node services/recommendation-service/dist/index.js
+    startCommand: node services/recommendation-service/dist/services/recommendation-service/src/index.js
     envVars:
       - key: MONGODB_URI
         sync: false
@@ -109,7 +109,7 @@ services:
     env: node
     plan: free
     buildCommand: pnpm install && pnpm turbo run build --filter=flow-service
-    startCommand: node services/flow-service/dist/index.js
+    startCommand: node services/flow-service/dist/services/flow-service/src/index.js
     envVars:
       - key: MONGODB_URI
         sync: false
@@ -124,7 +124,7 @@ services:
     env: node
     plan: free
     buildCommand: pnpm install && pnpm turbo run build --filter=comparison-service
-    startCommand: node services/comparison-service/dist/index.js
+    startCommand: node services/comparison-service/dist/services/comparison-service/src/index.js
     envVars:
       - key: MONGODB_URI
         sync: false
