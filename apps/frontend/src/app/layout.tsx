@@ -4,6 +4,8 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/layout/Header'
 import { ThemeProvider } from '@/contexts/ThemeContext'
+import { QueryProvider } from '@/providers/QueryProvider'
+import { ToastProvider } from '@/providers/ToastProvider'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -36,8 +38,11 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable}`}>
           <ThemeProvider>
-            <Header />
-            {children}
+            <QueryProvider>
+              <Header />
+              {children}
+              <ToastProvider />
+            </QueryProvider>
           </ThemeProvider>
         </body>
       </html>

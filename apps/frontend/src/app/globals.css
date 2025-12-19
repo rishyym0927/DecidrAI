@@ -15,6 +15,11 @@
   --surface-elevated: #ffffff;
   --muted: #6b6b6b;
   --border: #e5e5e5;
+
+  /* Toast notifications */
+  --toast-bg: #ffffff;
+  --toast-color: #000000;
+  --toast-border: #e5e5e5;
 }
 
 .dark {
@@ -25,6 +30,11 @@
   --surface-elevated: #0f0f0f;
   --muted: #a0a0a0;
   --border: #1a1a1a;
+
+  /* Toast notifications */
+  --toast-bg: #0f0f0f;
+  --toast-color: #ffffff;
+  --toast-border: #1a1a1a;
 }
 
 /* ============================================

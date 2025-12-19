@@ -1,29 +1,20 @@
 /**
  * Recommendation Service API endpoints
- * Communicates with recommendation-service via API Gateway
+ * Simplified with axios
  */
 
-import { apiClient } from './client';
-import type {
-    RecommendationRequest,
-    RecommendationResponse,
-    SessionRecommendationResponse,
-} from '@/types/recommendation';
+import api from '../axios';
 
 /**
  * Get recommendations based on tags
- * POST /api/recommend
  */
-export async function getRecommendations(request: RecommendationRequest) {
-    return apiClient.post<RecommendationResponse['data']>('/recommend', request);
-}
+export const getRecommendations = (data: { tags: string[]; limit?: number }) => {
+    return api.post('/recommend', data);
+};
 
 /**
- * Get recommendations from a completed flow session
- * GET /api/recommend/session/:sessionId
+ * Get recommendations from flow session
  */
-export async function getRecommendationsBySession(sessionId: string) {
-    return apiClient.get<SessionRecommendationResponse['data']>(
-        `/recommend/session/${sessionId}`
-    );
-}
+export const getRecommendationsBySession = (sessionId: string) => {
+    return api.get(`/recommend/session/${sessionId}`);
+};

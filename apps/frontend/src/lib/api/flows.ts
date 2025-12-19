@@ -1,64 +1,48 @@
 /**
  * Flow Service API endpoints
- * Communicates with flow-service via API Gateway
+ * Simplified with axios
  */
 
-import { apiClient } from './client';
-import type {
-    FlowsResponse,
-    FlowResponse,
-    StartFlowResponse,
-    SubmitAnswerResponse,
-    FlowSessionResponse,
-} from '@/types/flow';
+import api from '../axios';
 
 /**
  * Get all flows
- * GET /api/flows
  */
-export async function getFlows(params?: { category?: string; page?: number; limit?: number }) {
-    return apiClient.get<FlowsResponse['data']>('/flows', params);
-}
+export const getFlows = (params?: { category?: string; page?: number; limit?: number }) => {
+    return api.get('/flows', { params });
+};
 
 /**
  * Get flow by slug
- * GET /api/flows/:slug
  */
-export async function getFlowBySlug(slug: string) {
-    return apiClient.get<FlowResponse['data']>(`/flows/${slug}`);
-}
+export const getFlowBySlug = (slug: string) => {
+    return api.get(`/flows/${slug}`);
+};
 
 /**
  * Start a new flow session
- * POST /api/flows/:slug/start
  */
-export async function startFlow(slug: string) {
-    return apiClient.post<StartFlowResponse['data']>(`/flows/${slug}/start`);
-}
+export const startFlow = (slug: string) => {
+    return api.post(`/flows/${slug}/start`);
+};
 
 /**
  * Submit answer to current question
- * POST /api/flows/sessions/:sessionId/answer
  */
-export async function submitAnswer(sessionId: string, answer: string | string[]) {
-    return apiClient.post<SubmitAnswerResponse['data']>(
-        `/flows/sessions/${sessionId}/answer`,
-        { answer }
-    );
-}
+export const submitAnswer = (sessionId: string, answer: string | string[]) => {
+    return api.post(`/flows/sessions/${sessionId}/answer`, { answer });
+};
 
 /**
  * Get session status (for resuming)
- * GET /api/flows/sessions/:sessionId
  */
-export async function getFlowSession(sessionId: string) {
-    return apiClient.get<FlowSessionResponse['data']>(`/flows/sessions/${sessionId}`);
-}
+export const getFlowSession = (sessionId: string) => {
+    return api.get(`/flows/sessions/${sessionId}`);
+};
 
 /**
  * Complete flow and get extracted tags
- * POST /api/flows/sessions/:sessionId/complete
  */
-export async function completeFlow(sessionId: string) {
-    return apiClient.post<{ extractedTags: string[] }>(`/flows/sessions/${sessionId}/complete`);
-}
+export const completeFlow = (sessionId: string) => {
+    return api.post(`/flows/sessions/${sessionId}/complete`);
+};
