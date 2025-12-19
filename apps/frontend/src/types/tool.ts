@@ -1,5 +1,6 @@
 /**
  * Tool-related TypeScript types
+ * Matching actual backend API response
  */
 
 export interface Tool {
@@ -8,38 +9,53 @@ export interface Tool {
     slug: string;
     tagline: string;
     description: string;
-    category: string;
-    subcategory?: string;
-    website: string;
-    logo?: string;
+    long_description?: string;
+    logo_url?: string;
+    website_url: string;
+    categories: string[];
+    problems_solved: string[];
+    use_cases: string[];
     pricing: {
         model: 'free' | 'freemium' | 'paid' | 'enterprise';
-        startingPrice?: number;
-        currency?: string;
+        starting_price: number;
+        tiers?: Array<{
+            name: string;
+            price: number;
+            features: string[];
+            _id?: string;
+        }>;
     };
-    features: string[];
-    tags: string[];
-    rating?: number;
-    reviewCount?: number;
-    viewCount?: number;
-    isActive: boolean;
-    isFeatured: boolean;
-    isSponsored: boolean;
+    best_for: string[];
+    not_good_for: string[];
+    learning_curve: string;
+    has_api: boolean;
+    integrations: string[];
+    platforms: string[];
+    privacy_concerns?: string;
+    data_location?: string;
+    last_verified?: string;
+    is_sponsored: boolean;
+    view_count: number;
+    click_count: number;
+    alternatives: string[];
+    similar_tools: string[];
+    status: string;
     createdAt: string;
     updatedAt: string;
+    __v?: number;
+    score?: number; // Only in search results
 }
 
 export interface ToolFilters {
     category?: string;
-    pricing?: string;
-    tags?: string[];
-    search?: string;
+    price?: string;
+    learning_curve?: string;
     page?: number;
     limit?: number;
-    sort?: 'popular' | 'newest' | 'rating';
+    sort?: 'popular' | 'newest' | 'price-low' | 'price-high';
 }
 
-export interface ToolsResponse {
+export interface ToolsListResponse {
     success: boolean;
     data: {
         tools: Tool[];
@@ -52,7 +68,12 @@ export interface ToolsResponse {
     };
 }
 
-export interface ToolResponse {
+export interface ToolsSearchResponse {
+    success: boolean;
+    data: Tool[]; // Note: Search returns array directly, not { tools: [] }
+}
+
+export interface ToolDetailResponse {
     success: boolean;
     data: Tool;
 }

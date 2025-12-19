@@ -77,6 +77,10 @@ async function proxyRequest(
 router.get('/tools', (req, res) =>
     proxyRequest(req, res, SERVICES.tool.url, '/tools'));
 
+// Search route MUST come before :slug route
+router.get('/tools/search', (req, res) =>
+    proxyRequest(req, res, SERVICES.tool.url, '/tools/search'));
+
 router.get('/tools/:slug', (req, res) =>
     proxyRequest(req, res, SERVICES.tool.url, `/tools/${req.params.slug}`));
 
@@ -101,12 +105,7 @@ router.delete('/admin/tools/:id', authMiddleware, (req, res) =>
 router.get('/flows', (req, res) =>
     proxyRequest(req, res, SERVICES.flow.url, '/flows'));
 
-router.get('/flows/:slug', (req, res) =>
-    proxyRequest(req, res, SERVICES.flow.url, `/flows/${req.params.slug}`));
-
-router.post('/flows/:slug/start', (req, res) =>
-    proxyRequest(req, res, SERVICES.flow.url, `/flows/${req.params.slug}/start`));
-
+// Session routes MUST come before :slug to avoid matching "sessions" as a slug
 router.get('/flows/sessions/:sessionId', (req, res) =>
     proxyRequest(req, res, SERVICES.flow.url, `/flows/sessions/${req.params.sessionId}`));
 
@@ -115,6 +114,13 @@ router.post('/flows/sessions/:sessionId/answer', (req, res) =>
 
 router.post('/flows/sessions/:sessionId/complete', (req, res) =>
     proxyRequest(req, res, SERVICES.flow.url, `/flows/sessions/${req.params.sessionId}/complete`));
+
+// Slug routes
+router.get('/flows/:slug', (req, res) =>
+    proxyRequest(req, res, SERVICES.flow.url, `/flows/${req.params.slug}`));
+
+router.post('/flows/:slug/start', (req, res) =>
+    proxyRequest(req, res, SERVICES.flow.url, `/flows/${req.params.slug}/start`));
 
 // Admin routes (protected)
 router.post('/admin/flows', authMiddleware, (req, res) =>

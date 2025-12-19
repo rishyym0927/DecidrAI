@@ -1,48 +1,70 @@
 /**
  * Flow Service API endpoints
- * Simplified with axios
+ * Matching actual backend responses
  */
 
 import api from '../axios';
+import type {
+    FlowsListResponse,
+    FlowDetailResponse,
+    FlowStartResponse,
+    SubmitAnswerResponse,
+    SessionResponse
+} from '@/types/flow';
 
 /**
- * Get all flows
+ * Get all flows with optional filters
+ * GET /flows?page=1&limit=12&category=interview
  */
-export const getFlows = (params?: { category?: string; page?: number; limit?: number }) => {
+export const getFlows = (params?: {
+    page?: number;
+    limit?: number;
+    category?: string;
+    sort?: string;
+}): Promise<FlowsListResponse> => {
     return api.get('/flows', { params });
 };
 
 /**
  * Get flow by slug
+ * GET /flows/:slug
  */
-export const getFlowBySlug = (slug: string) => {
+export const getFlowBySlug = (slug: string): Promise<FlowDetailResponse> => {
     return api.get(`/flows/${slug}`);
 };
 
 /**
- * Start a new flow session
+ * Start a flow session
+ * POST /flows/:slug/start
  */
-export const startFlow = (slug: string) => {
-    return api.post(`/flows/${slug}/start`);
+export const startFlow = (slug: string, userId?: string): Promise<FlowStartResponse> => {
+    return api.post(`/flows/${slug}/start`, { userId });
 };
 
 /**
- * Submit answer to current question
+ * Submit an answer for a flow session
+ * POST /flows/sessions/:sessionId/answer
  */
-export const submitAnswer = (sessionId: string, answer: string | string[]) => {
-    return api.post(`/flows/sessions/${sessionId}/answer`, { answer });
+export const submitAnswer = (
+    sessionId: string,
+    questionId: string,
+    value: string | string[]
+): Promise<SubmitAnswerResponse> => {
+    return api.post(`/flows/sessions/${sessionId}/answer`, { questionId, value });
 };
 
 /**
- * Get session status (for resuming)
+ * Get session details
+ * GET /flows/sessions/:sessionId
  */
-export const getFlowSession = (sessionId: string) => {
+export const getSession = (sessionId: string): Promise<SessionResponse> => {
     return api.get(`/flows/sessions/${sessionId}`);
 };
 
 /**
- * Complete flow and get extracted tags
+ * Complete a flow session manually
+ * POST /flows/sessions/:sessionId/complete
  */
-export const completeFlow = (sessionId: string) => {
+export const completeFlow = (sessionId: string): Promise<SubmitAnswerResponse> => {
     return api.post(`/flows/sessions/${sessionId}/complete`);
 };

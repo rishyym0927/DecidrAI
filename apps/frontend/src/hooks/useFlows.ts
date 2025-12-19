@@ -1,6 +1,6 @@
 /**
  * React Query hooks for Flows API
- * Provides automatic caching, loading states, and error handling
+ * Matching actual backend responses
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -9,25 +9,37 @@ import {
     getFlowBySlug,
     startFlow,
     submitAnswer,
-    getFlowSession,
-    completeFlow,
+    getSession,
+    completeFlow
 } from '@/lib/api';
+import type {
+    FlowsListResponse,
+    FlowDetailResponse,
+    FlowStartResponse,
+    SubmitAnswerResponse,
+    SessionResponse
+} from '@/types/flow';
 
 /**
- * Get all flows
+ * Get all flows with optional filters
  */
-export const useFlows = (params?: { category?: string; page?: number; limit?: number }) => {
-    return useQuery({
+export const useFlows = (params?: {
+    page?: number;
+    limit?: number;
+    category?: string;
+    sort?: string;
+}) => {
+    return useQuery<FlowsListResponse>({
         queryKey: ['flows', params],
         queryFn: () => getFlows(params),
     });
 };
 
 /**
- * Get single flow by slug
+ * Get flow by slug
  */
 export const useFlow = (slug: string) => {
-    return useQuery({
+    return useQuery<FlowDetailResponse>({
         queryKey: ['flows', slug],
         queryFn: () => getFlowBySlug(slug),
         enabled: !!slug,
@@ -38,52 +50,56 @@ export const useFlow = (slug: string) => {
  * Get flow session
  */
 export const useFlowSession = (sessionId: string) => {
-    return useQuery({
-        queryKey: ['flows', 'sessions', sessionId],
-        queryFn: () => getFlowSession(sessionId),
+    return useQuery<SessionResponse>({
+        queryKey: ['sessions', sessionId],
+        queryFn: () => getSession(sessionId),
         enabled: !!sessionId,
     });
 };
 
 /**
- * Start a new flow session
+ * Start a flow (mutation)
  */
 export const useStartFlow = () => {
     const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: (slug: string) => startFlow(slug),
+    return useMutation<FlowStartResponse, Error, { slug: string; userId?: string }>({
+        mutationFn: ({ slug, userId }) => startFlow(slug, userId),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['flows', 'sessions'] });
+            queryClient.invalidateQueries({ queryKey: ['sessions'] });
         },
     });
 };
 
 /**
- * Submit answer to flow question
+ * Submit an answer (mutation)
  */
 export const useSubmitAnswer = () => {
     const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: ({ sessionId, answer }: { sessionId: string; answer: string | string[] }) =>
-            submitAnswer(sessionId, answer),
+    return useMutation<
+        SubmitAnswerResponse,
+        Error,
+        { sessionId: string; questionId: string; value: string | string[] }
+    >({
+        mutationFn: ({ sessionId, questionId, value }) =>
+            submitAnswer(sessionId, questionId, value),
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['flows', 'sessions', variables.sessionId] });
+            queryClient.invalidateQueries({ queryKey: ['sessions', variables.sessionId] });
         },
     });
 };
 
 /**
- * Complete flow and get tags
+ * Complete a flow (mutation)
  */
 export const useCompleteFlow = () => {
     const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: (sessionId: string) => completeFlow(sessionId),
+    return useMutation<SubmitAnswerResponse, Error, string>({
+        mutationFn: (sessionId) => completeFlow(sessionId),
         onSuccess: (_, sessionId) => {
-            queryClient.invalidateQueries({ queryKey: ['flows', 'sessions', sessionId] });
+            queryClient.invalidateQueries({ queryKey: ['sessions', sessionId] });
         },
     });
 };

@@ -1,58 +1,111 @@
 /**
  * Flow-related TypeScript types
+ * Matching actual backend API response
  */
 
+// Question option in flow
+export interface QuestionOption {
+    label: string;
+    value: string;
+}
+
+// Question in flow detail
 export interface Question {
     id: string;
     text: string;
     type: 'single' | 'multiple' | 'text' | 'scale';
-    options?: string[];
-    tags?: Record<string, string[]>; // option -> tags mapping
-    conditionalLogic?: {
-        showIf?: {
-            questionId: string;
-            answer: string | string[];
+    options?: QuestionOption[];
+    required: boolean;
+    questionNumber: number;
+    totalQuestions: number;
+}
+
+// Flow summary (from list endpoint)
+export interface FlowSummary {
+    _id: string;
+    title: string;
+    slug: string;
+    description: string;
+    icon: string;
+    category: string;
+    popularity: number;
+    completionRate: number;
+    avgTimeSeconds: number;
+    estimatedTimeMinutes: number;
+}
+
+// Flow detail (from slug endpoint)
+export interface FlowDetail {
+    title: string;
+    slug: string;
+    description: string;
+    icon: string;
+    category: string;
+    totalQuestions: number;
+    estimatedTimeMinutes: number;
+    questions: Question[];
+}
+
+// Flow session start response
+export interface FlowStartResponse {
+    success: boolean;
+    data: {
+        sessionId: string;
+        flow: {
+            title: string;
+            slug: string;
+            description: string;
+            icon: string;
+            category: string;
+            totalQuestions: number;
+            estimatedTimeMinutes: number;
         };
+        currentQuestion: Question;
+        progress: number;
     };
 }
 
-export interface Flow {
-    _id: string;
-    name: string;
-    slug: string;
-    description: string;
-    category: string;
-    icon?: string;
-    questions: Question[];
-    estimatedTime: number; // in minutes
-    isActive: boolean;
-    createdAt: string;
-    updatedAt: string;
-}
-
-export interface FlowAnswer {
-    questionId: string;
-    answer: string | string[];
-}
-
-export interface FlowSession {
-    _id: string;
-    flowId: string;
-    userId?: string;
-    currentQuestionIndex: number;
-    answers: FlowAnswer[];
-    extractedTags: string[];
-    status: 'in-progress' | 'completed' | 'abandoned';
-    completedAt?: string;
-    createdAt: string;
-    expiresAt: string;
-}
-
-export interface FlowsResponse {
+// Submit answer response
+export interface SubmitAnswerResponse {
     success: boolean;
     data: {
-        flows: Flow[];
-        pagination?: {
+        sessionId: string;
+        currentQuestion?: Question;
+        extractedTags: string[];
+        progress: number;
+        status?: 'completed';
+        message?: string;
+    };
+}
+
+// Session details response
+export interface SessionResponse {
+    success: boolean;
+    data: {
+        sessionId: string;
+        flow: {
+            title: string;
+            slug: string;
+            description: string;
+            icon: string;
+            category: string;
+            totalQuestions: number;
+            estimatedTimeMinutes: number;
+        };
+        status: 'in_progress' | 'completed' | 'abandoned';
+        progress: number;
+        answeredQuestions: number;
+        extractedTags: string[];
+        currentQuestion?: Question;
+    };
+}
+
+// Flows list response
+export interface FlowsListResponse {
+    success: boolean;
+    data: {
+        flows: FlowSummary[];
+        pagination: {
             page: number;
             limit: number;
             total: number;
@@ -61,33 +114,8 @@ export interface FlowsResponse {
     };
 }
 
-export interface FlowResponse {
+// Flow detail response
+export interface FlowDetailResponse {
     success: boolean;
-    data: Flow;
-}
-
-export interface FlowSessionResponse {
-    success: boolean;
-    data: {
-        session: FlowSession;
-        currentQuestion?: Question;
-        isComplete: boolean;
-    };
-}
-
-export interface StartFlowResponse {
-    success: boolean;
-    data: {
-        sessionId: string;
-        question: Question;
-    };
-}
-
-export interface SubmitAnswerResponse {
-    success: boolean;
-    data: {
-        nextQuestion?: Question;
-        isComplete: boolean;
-        extractedTags?: string[];
-    };
+    data: FlowDetail;
 }

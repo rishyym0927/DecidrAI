@@ -1,17 +1,17 @@
 /**
  * React Query hooks for Tools API
- * Provides automatic caching, loading states, and error handling
+ * Properly typed to match backend responses
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getTools, searchTools, getToolBySlug, getRelatedTools } from '@/lib/api';
-import type { ToolFilters } from '@/types/tool';
+import type { ToolFilters, ToolsListResponse, ToolsSearchResponse, ToolDetailResponse, Tool } from '@/types/tool';
 
 /**
  * Get all tools with filters
  */
 export const useTools = (filters?: ToolFilters) => {
-    return useQuery({
+    return useQuery<ToolsListResponse>({
         queryKey: ['tools', filters],
         queryFn: () => getTools(filters),
     });
@@ -21,10 +21,10 @@ export const useTools = (filters?: ToolFilters) => {
  * Search tools
  */
 export const useSearchTools = (query: string, enabled = true) => {
-    return useQuery({
+    return useQuery<ToolsSearchResponse>({
         queryKey: ['tools', 'search', query],
         queryFn: () => searchTools(query),
-        enabled: enabled && query.length > 0,
+        enabled: enabled && query.length >= 3,
     });
 };
 
@@ -32,7 +32,7 @@ export const useSearchTools = (query: string, enabled = true) => {
  * Get single tool by slug
  */
 export const useTool = (slug: string) => {
-    return useQuery({
+    return useQuery<ToolDetailResponse>({
         queryKey: ['tools', slug],
         queryFn: () => getToolBySlug(slug),
         enabled: !!slug,
@@ -43,7 +43,7 @@ export const useTool = (slug: string) => {
  * Get related tools
  */
 export const useRelatedTools = (slug: string) => {
-    return useQuery({
+    return useQuery<{ success: boolean; data: Tool[] }>({
         queryKey: ['tools', slug, 'related'],
         queryFn: () => getRelatedTools(slug),
         enabled: !!slug,

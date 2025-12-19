@@ -37,7 +37,7 @@ export default function SearchPage() {
       {query.length > 2 && !isLoading && (
         <div>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            {data?.data?.total || 0} results for "{query}"
+            {Array.isArray(data?.data) ? data?.data.length : 0} results for "{query}"
           </p>
 
           <div className="space-y-6">
