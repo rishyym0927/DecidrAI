@@ -10,13 +10,16 @@ let redis: Redis | null = null;
 
 export function getRedisClient() {
   if (!redis) {
-    if (!process.env.REDIS_URL || !process.env.REDIS_TOKEN) {
-      throw new Error("Redis env variables missing");
+    if (!process.env.REDIS_URL) {
+      throw new Error("Redis env variable REDIS_URL missing");
     }
 
-    redis = new Redis(process.env.REDIS_URL, {
-      password: process.env.REDIS_TOKEN,
-    });
+    const options: any = {};
+    if (process.env.REDIS_TOKEN) {
+      options.password = process.env.REDIS_TOKEN;
+    }
+
+    redis = new Redis(process.env.REDIS_URL, options);
     redis.on('error', (err) => {
       console.error('Redis connection error:', err);
     });
