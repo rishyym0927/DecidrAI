@@ -1,61 +1,18 @@
 /**
  * Featured Tools Section
- * Showcases popular AI tools with their logos
+ * Fetches and displays popular AI tools from API
  */
 
+'use client';
+
 import Link from 'next/link';
+import { useTools } from '@/hooks';
+import ToolCard from '@/components/tools/ToolCard';
+import type { Tool } from '@/types/tool';
 
 export default function FeaturedToolsSection() {
-  const tools = [
-    {
-      name: 'ChatGPT',
-      slug: 'chatgpt',
-      tagline: 'Conversational AI assistant',
-      category: 'Content Creation',
-      logo: '🤖',
-      color: 'bg-emerald-500',
-    },
-    {
-      name: 'Midjourney',
-      slug: 'midjourney',
-      tagline: 'AI image generation',
-      category: 'Design & Art',
-      logo: '🎨',
-      color: 'bg-violet-500',
-    },
-    {
-      name: 'GitHub Copilot',
-      slug: 'github-copilot',
-      tagline: 'AI pair programmer',
-      category: 'Development',
-      logo: '💻',
-      color: 'bg-blue-500',
-    },
-    {
-      name: 'Jasper',
-      slug: 'jasper',
-      tagline: 'AI content platform',
-      category: 'Marketing',
-      logo: '✨',
-      color: 'bg-purple-500',
-    },
-    {
-      name: 'Notion AI',
-      slug: 'notion-ai',
-      tagline: 'AI-powered workspace',
-      category: 'Productivity',
-      logo: '📝',
-      color: 'bg-gray-700',
-    },
-    {
-      name: 'Runway',
-      slug: 'runway',
-      tagline: 'AI video editing',
-      category: 'Video & Audio',
-      logo: '🎬',
-      color: 'bg-pink-500',
-    },
-  ];
+  const { data: response, isLoading } = useTools({ limit: 6, sort: 'popular' });
+  const tools = response?.data?.tools || [];
 
   return (
     <section className="py-20 md:py-32 bg-[var(--surface)]">
@@ -71,36 +28,28 @@ export default function FeaturedToolsSection() {
             </p>
           </div>
 
+          {/* Loading State */}
+          {isLoading && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="border border-[var(--border)] rounded-2xl p-6 animate-pulse">
+                  <div className="w-14 h-14 bg-[var(--border)] rounded-xl mb-4"></div>
+                  <div className="h-6 bg-[var(--border)] rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-[var(--border)] rounded w-full mb-3"></div>
+                  <div className="h-6 bg-[var(--border)] rounded w-1/3"></div>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Tools Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {tools.map((tool) => (
-              <Link
-                key={tool.slug}
-                href={`/tools/${tool.slug}`}
-                className="group border border-[var(--border)] rounded-2xl p-6 hover:border-[var(--foreground)] transition-all hover-lift bg-[var(--background)]"
-              >
-                {/* Logo */}
-                <div className={`inline-flex items-center justify-center w-14 h-14 ${tool.color} rounded-xl mb-4 text-2xl`}>
-                  {tool.logo}
-                </div>
-
-                {/* Tool Name */}
-                <h3 className="text-xl font-bold mb-2 group-hover:underline">
-                  {tool.name}
-                </h3>
-
-                {/* Tagline */}
-                <p className="text-[var(--muted)] mb-3">
-                  {tool.tagline}
-                </p>
-
-                {/* Category Badge */}
-                <div className="inline-block px-3 py-1 bg-[var(--surface)] rounded-full text-xs font-medium">
-                  {tool.category}
-                </div>
-              </Link>
-            ))}
-          </div>
+          {!isLoading && tools.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {tools.map((tool: Tool) => (
+                <ToolCard key={tool._id} tool={tool} />
+              ))}
+            </div>
+          )}
 
           {/* View All Link */}
           <div className="text-center mt-12">

@@ -1,62 +1,57 @@
 /**
  * Popular Categories Section
- * Shows main tool categories with colorful icons
+ * Shows main tool categories with icons
  */
 
 import Link from 'next/link';
 
-export default function CategoriesSection() {
-  const categories = [
-    {
-      name: 'Content Creation',
-      slug: 'content-creation',
-      icon: '✍️',
-      color: 'bg-blue-500',
-      description: 'Writing, blogging, copywriting',
-      count: 45,
-    },
-    {
-      name: 'Design & Art',
-      slug: 'design-art',
-      icon: '🎨',
-      color: 'bg-purple-500',
-      description: 'Image generation, design tools',
-      count: 38,
-    },
-    {
-      name: 'Development',
-      slug: 'development',
-      icon: '💻',
-      color: 'bg-green-500',
-      description: 'Code generation, debugging',
-      count: 52,
-    },
-    {
-      name: 'Marketing',
-      slug: 'marketing',
-      icon: '📈',
-      color: 'bg-orange-500',
-      description: 'SEO, ads, social media',
-      count: 34,
-    },
-    {
-      name: 'Productivity',
-      slug: 'productivity',
-      icon: '⚡',
-      color: 'bg-yellow-500',
-      description: 'Automation, organization',
-      count: 41,
-    },
-    {
-      name: 'Video & Audio',
-      slug: 'video-audio',
-      icon: '🎬',
-      color: 'bg-red-500',
-      description: 'Video editing, voice synthesis',
-      count: 29,
-    },
-  ];
+// Categories data - these are fixed structure but could be fetched from API
+const categories = [
+  {
+    name: 'Productivity',
+    slug: 'productivity',
+    icon: '⚡',
+    color: 'bg-yellow-500',
+    description: 'Automation, organization, workflows',
+  },
+  {
+    name: 'Writing',
+    slug: 'writing',
+    icon: '✍️',
+    color: 'bg-blue-500',
+    description: 'Content creation, copywriting, editing',
+  },
+  {
+    name: 'Development',
+    slug: 'development',
+    icon: '💻',
+    color: 'bg-green-500',
+    description: 'Code generation, debugging, pair programming',
+  },
+  {
+    name: 'Marketing',
+    slug: 'marketing',
+    icon: '📈',
+    color: 'bg-orange-500',
+    description: 'SEO, ads, social media',
+  },
+  {
+    name: 'Design',
+    slug: 'design',
+    icon: '🎨',
+    color: 'bg-purple-500',
+    description: 'Image generation, UI design, creativity',
+  },
+  {
+    name: 'Video & Audio',
+    slug: 'video',
+    icon: '🎬',
+    color: 'bg-red-500',
+    description: 'Video editing, voice synthesis, music',
+  },
+];
 
+export default function CategoriesSection() {
   return (
     <section className="py-20 md:py-32 bg-[var(--background)]">
       <div className="container mx-auto px-4">
@@ -76,7 +71,7 @@ export default function CategoriesSection() {
             {categories.map((category) => (
               <Link
                 key={category.slug}
-                href={`/categories/${category.slug}`}
+                href={`/tools?category=${category.slug}`}
                 className="group border border-[var(--border)] rounded-2xl p-6 hover:border-[var(--foreground)] transition-all hover-lift bg-[var(--background)]"
               >
                 {/* Icon with colored background */}
@@ -90,14 +85,9 @@ export default function CategoriesSection() {
                 </h3>
 
                 {/* Description */}
-                <p className="text-[var(--muted)] mb-3 text-sm">
+                <p className="text-[var(--muted)] text-sm">
                   {category.description}
                 </p>
-
-                {/* Tool Count */}
-                <div className="text-sm text-[var(--muted)]">
-                  {category.count} tools
-                </div>
               </Link>
             ))}
           </div>
@@ -105,10 +95,10 @@ export default function CategoriesSection() {
           {/* View All Link */}
           <div className="text-center mt-12">
             <Link
-              href="/categories"
+              href="/tools"
               className="inline-block text-lg font-semibold hover:underline"
             >
-              View All Categories →
+              View All Tools →
             </Link>
           </div>
         </div>

@@ -1,11 +1,21 @@
 /**
  * Hero Section Component
- * Main headline and CTA for the homepage
+ * Main headline and CTA for the homepage with live stats
  */
 
+'use client';
+
 import Link from 'next/link';
+import { useTools, useFlows } from '@/hooks';
 
 export default function HeroSection() {
+  // Fetch stats for trust indicators
+  const { data: toolsResponse } = useTools({ limit: 1 });
+  const { data: flowsResponse } = useFlows({ limit: 1 });
+
+  const toolCount = toolsResponse?.data?.pagination?.total || 0;
+  const flowCount = flowsResponse?.data?.pagination?.total || 0;
+
   return (
     <section className="border-b border-[var(--border)] bg-[var(--background)]">
       <div className="container mx-auto px-4 py-20 md:py-32">
@@ -39,15 +49,23 @@ export default function HeroSection() {
             </Link>
           </div>
 
-          {/* Trust Indicators */}
+          {/* Stats & Trust Indicators */}
           <div className="mt-16 flex flex-wrap justify-center items-center gap-8 text-sm text-[var(--muted)]">
+            {toolCount > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🛠️</span>
+                <span><strong className="text-[var(--foreground)]">{toolCount}+</strong> AI Tools</span>
+              </div>
+            )}
+            {flowCount > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🎯</span>
+                <span><strong className="text-[var(--foreground)]">{flowCount}</strong> Discovery Flows</span>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <span className="text-2xl">✨</span>
               <span>AI-Powered</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🎯</span>
-              <span>Intent-Based</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-2xl">⚡</span>

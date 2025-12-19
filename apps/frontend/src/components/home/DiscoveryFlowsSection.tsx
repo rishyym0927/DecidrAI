@@ -1,40 +1,18 @@
 /**
  * Discovery Flows Section
- * Highlights the discovery flow feature
+ * Fetches and displays discovery flows from API
  */
 
+'use client';
+
 import Link from 'next/link';
+import { useFlows } from '@/hooks';
+import FlowCard from '@/components/discover/FlowCard';
+import type { FlowSummary } from '@/types/flow';
 
 export default function DiscoveryFlowsSection() {
-  const flows = [
-    {
-      title: 'Content Creation Flow',
-      slug: 'content-creation',
-      description: 'Find the perfect tool for writing, blogging, or creating content',
-      icon: '✍️',
-      questions: 5,
-      time: '2 min',
-      color: 'bg-blue-500',
-    },
-    {
-      title: 'Design Assistant Finder',
-      slug: 'design-assistant',
-      description: 'Discover AI tools for graphic design, image generation, and more',
-      icon: '🎨',
-      questions: 6,
-      time: '3 min',
-      color: 'bg-purple-500',
-    },
-    {
-      title: 'Developer Tools Guide',
-      slug: 'developer-tools',
-      description: 'Get matched with coding assistants and development tools',
-      icon: '💻',
-      questions: 7,
-      time: '3 min',
-      color: 'bg-green-500',
-    },
-  ];
+  const { data: response, isLoading } = useFlows({ limit: 3, sort: 'popular' });
+  const flows = response?.data?.flows || [];
 
   return (
     <section className="py-20 md:py-32 bg-[var(--background)]">
@@ -50,43 +28,32 @@ export default function DiscoveryFlowsSection() {
             </p>
           </div>
 
+          {/* Loading State */}
+          {isLoading && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="border border-[var(--border)] rounded-2xl p-6 animate-pulse">
+                  <div className="w-16 h-16 bg-[var(--border)] rounded-xl mb-4"></div>
+                  <div className="h-6 bg-[var(--border)] rounded w-3/4 mb-3"></div>
+                  <div className="h-4 bg-[var(--border)] rounded w-full mb-2"></div>
+                  <div className="h-4 bg-[var(--border)] rounded w-2/3 mb-4"></div>
+                  <div className="flex gap-4">
+                    <div className="h-4 bg-[var(--border)] rounded w-16"></div>
+                    <div className="h-4 bg-[var(--border)] rounded w-16"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Flows Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {flows.map((flow) => (
-              <Link
-                key={flow.slug}
-                href={`/discover/${flow.slug}`}
-                className="group border border-[var(--border)] rounded-2xl p-6 hover:border-[var(--foreground)] transition-all hover-lift bg-[var(--background)]"
-              >
-                {/* Icon */}
-                <div className={`inline-flex items-center justify-center w-16 h-16 ${flow.color} rounded-xl mb-4 text-3xl`}>
-                  {flow.icon}
-                </div>
-
-                {/* Title */}
-                <h3 className="text-xl font-bold mb-3 group-hover:underline">
-                  {flow.title}
-                </h3>
-
-                {/* Description */}
-                <p className="text-[var(--muted)] mb-4 leading-relaxed">
-                  {flow.description}
-                </p>
-
-                {/* Meta Info */}
-                <div className="flex items-center gap-4 text-sm text-[var(--muted)]">
-                  <div className="flex items-center gap-1">
-                    <span>❓</span>
-                    <span>{flow.questions} questions</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span>⏱️</span>
-                    <span>{flow.time}</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {!isLoading && flows.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {flows.map((flow: FlowSummary) => (
+                <FlowCard key={flow._id} flow={flow} />
+              ))}
+            </div>
+          )}
 
           {/* View All Link */}
           <div className="text-center mt-12">
