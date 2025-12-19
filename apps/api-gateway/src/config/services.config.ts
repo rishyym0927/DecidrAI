@@ -1,30 +1,36 @@
 /**
  * Microservices configuration
  */
+const normalizeUrl = (url?: string, defaultUrl?: string) => {
+    if (!url) return defaultUrl || '';
+    if (url.startsWith('http')) return url;
+    return `https://${url}`;
+};
+
 export const SERVICES = {
     auth: {
         name: 'auth-service',
-        url: process.env.AUTH_SERVICE_URL || 'http://localhost:5002',
+        get url() { return normalizeUrl(process.env.AUTH_SERVICE_URL, 'http://localhost:5002'); },
         healthPath: '/health'
     },
     tool: {
         name: 'tool-service',
-        url: process.env.TOOL_SERVICE_URL || 'http://localhost:5003',
+        get url() { return normalizeUrl(process.env.TOOL_SERVICE_URL, 'http://localhost:5003'); },
         healthPath: '/health'
     },
     flow: {
         name: 'flow-service',
-        url: process.env.FLOW_SERVICE_URL || 'http://localhost:5004',
+        get url() { return normalizeUrl(process.env.FLOW_SERVICE_URL, 'http://localhost:5004'); },
         healthPath: '/health'
     },
     comparison: {
         name: 'comparison-service',
-        url: process.env.COMPARISON_SERVICE_URL || 'http://localhost:5005',
+        get url() { return normalizeUrl(process.env.COMPARISON_SERVICE_URL, 'http://localhost:5005'); },
         healthPath: '/health'
     },
     recommendation: {
         name: 'recommendation-service',
-        url: process.env.RECOMMENDATION_SERVICE_URL || 'http://localhost:5001',
+        get url() { return normalizeUrl(process.env.RECOMMENDATION_SERVICE_URL, 'http://localhost:5001'); },
         healthPath: '/health'
     }
 } as const;

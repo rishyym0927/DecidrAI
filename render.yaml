@@ -15,7 +15,7 @@ services:
         fromService:
           type: web
           name: decidrai-gateway
-          property: url
+          property: host
 
   # ---------------------------------------
   # 2. API GATEWAY (Express)
@@ -35,22 +35,22 @@ services:
         fromService:
           type: web
           name: decidrai-tool-service
-          property: url
+          property: host
       - key: AUTH_SERVICE_URL
         fromService:
           type: web
           name: decidrai-auth-service
-          property: url
+          property: host
       - key: RECOMMENDATION_SERVICE_URL
         fromService:
           type: web
           name: decidrai-rec-service
-          property: url
+          property: host
       - key: FLOW_SERVICE_URL
         fromService:
           type: web
           name: decidrai-flow-service
-          property: url
+          property: host
 
   # ---------------------------------------
   # 3. AUTH SERVICE
