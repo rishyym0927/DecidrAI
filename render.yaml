@@ -1,0 +1,134 @@
+services:
+  # ---------------------------------------
+  # 1. FRONTEND (Next.js)
+  # ---------------------------------------
+  - type: web
+    name: decidrai-frontend
+    env: node
+    plan: free 
+    buildCommand: pnpm install && pnpm turbo run build --filter=frontend
+    startCommand: pnpm --filter=frontend start
+    envVars:
+      - key: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+        sync: false # You must enter this in Render Dashboard
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: decidrai-gateway
+          property: url
+
+  # ---------------------------------------
+  # 2. API GATEWAY (Express)
+  # ---------------------------------------
+  - type: web
+    name: decidrai-gateway
+    env: node
+    plan: free
+    buildCommand: pnpm install && pnpm turbo run build --filter=api-gateway
+    startCommand: node apps/api-gateway/dist/server.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: TOOL_SERVICE_URL
+        fromService:
+          type: web
+          name: decidrai-tool-service
+          property: url
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: decidrai-auth-service
+          property: url
+      - key: RECOMMENDATION_SERVICE_URL
+        fromService:
+          type: web
+          name: decidrai-rec-service
+          property: url
+      - key: FLOW_SERVICE_URL
+        fromService:
+          type: web
+          name: decidrai-flow-service
+          property: url
+
+  # ---------------------------------------
+  # 3. AUTH SERVICE
+  # ---------------------------------------
+  - type: web
+    name: decidrai-auth-service
+    env: node
+    plan: free
+    buildCommand: pnpm install && pnpm turbo run build --filter=auth-service
+    startCommand: node services/auth-service/dist/index.js
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: CLERK_WEBHOOK_SECRET
+        sync: false
+
+  # ---------------------------------------
+  # 4. TOOL SERVICE
+  # ---------------------------------------
+  - type: web
+    name: decidrai-tool-service
+    env: node
+    plan: free
+    buildCommand: pnpm install && pnpm turbo run build --filter=tool-service
+    startCommand: node services/tool-service/dist/index.js
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: REDIS_URL
+        sync: false
+
+  # ---------------------------------------
+  # 5. RECOMMENDATION SERVICE
+  # ---------------------------------------
+  - type: web
+    name: decidrai-rec-service
+    env: node
+    plan: free
+    buildCommand: pnpm install && pnpm turbo run build --filter=recommendation-service
+    startCommand: node services/recommendation-service/dist/index.js
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+
+  # ---------------------------------------
+  # 6. FLOW SERVICE
+  # ---------------------------------------
+  - type: web
+    name: decidrai-flow-service
+    env: node
+    plan: free
+    buildCommand: pnpm install && pnpm turbo run build --filter=flow-service
+    startCommand: node services/flow-service/dist/index.js
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: REDIS_URL
+        sync: false
+
+  # ---------------------------------------
+  # 7. COMPARISON SERVICE
+  # ---------------------------------------
+  - type: web
+    name: decidrai-comparison-service
+    env: node
+    plan: free
+    buildCommand: pnpm install && pnpm turbo run build --filter=comparison-service
+    startCommand: node services/comparison-service/dist/index.js
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
