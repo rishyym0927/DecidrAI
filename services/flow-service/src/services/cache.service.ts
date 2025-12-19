@@ -1,4 +1,4 @@
-import { getRedisClient } from '../../../../packages/db/src/redis';
+import { getRedisClient } from 'db';
 
 /**
  * Cache Service

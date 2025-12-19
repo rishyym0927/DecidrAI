@@ -2,9 +2,9 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
-import { connectMongo } from "../../../packages/db/src/mongo";
+import { connectMongo } from "db";
 import { createRequestLogger } from "logger";
-import { errorHandler, notFoundHandler } from "../../../apps/api-gateway/src/middleware/errorHandler.middleware"; // We should probably move this to 'errors' package in future refactor
+// import { errorHandler, notFoundHandler } from "../../../apps/api-gateway/src/middleware/errorHandler.middleware"; // REMOVED: Circular dependency
 
 import clerkWebhook from "./routes/clerkWebhook";
 import authRoutes from "./routes/auth.routes";

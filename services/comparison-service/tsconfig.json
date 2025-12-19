@@ -8,11 +8,11 @@
         "skipLibCheck": true,
         "strict": true,
         "resolveJsonModule": true,
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "rootDir": "./src"
     },
     "include": [
-        "src/**/*",
-        "../../packages/db/src/**/*"
+        "src/**/*"
     ],
     "exclude": [
         "node_modules",

@@ -1,9 +1,12 @@
-import dotenv from 'dotenv';
-import { connectMongo, disconnectMongo } from 'db';
-import { Tool } from '../models/Tool';
-
-dotenv.config();
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const dotenv_1 = __importDefault(require("dotenv"));
+const mongo_1 = require("../../../../packages/db/src/mongo");
+const Tool_1 = require("../models/Tool");
+dotenv_1.default.config();
 const sampleTools = [
     {
         name: 'ChatGPT',
@@ -299,43 +302,33 @@ const sampleTools = [
         status: 'published'
     }
 ];
-
 async function seedDatabase() {
     try {
         console.log('🌱 Starting database seed...\n');
-
         // Connect to MongoDB
-        await connectMongo(
-            process.env.MONGODB_URI!,
-            process.env.MONGODB_DB_NAME || 'decidrai_tools'
-        );
-
+        await (0, mongo_1.connectMongo)(process.env.MONGODB_URI, process.env.MONGODB_DB_NAME || 'decidrai_tools');
         // Clear existing tools (optional - comment out if you want to keep existing data)
         console.log('🗑️  Clearing existing tools...');
-        await Tool.deleteMany({});
+        await Tool_1.Tool.deleteMany({});
         console.log('✅ Existing tools cleared\n');
-
         // Insert sample tools
         console.log('📝 Inserting sample tools...');
-        const inserted = await Tool.insertMany(sampleTools);
+        const inserted = await Tool_1.Tool.insertMany(sampleTools);
         console.log(`✅ Inserted ${inserted.length} tools\n`);
-
         // Display inserted tools
         console.log('📋 Inserted tools:');
         inserted.forEach((tool, index) => {
             console.log(`   ${index + 1}. ${tool.name} (${tool.slug})`);
         });
-
         console.log('\n✨ Database seeding completed successfully!\n');
-
         // Disconnect
-        await disconnectMongo();
+        await (0, mongo_1.disconnectMongo)();
         process.exit(0);
-    } catch (error) {
+    }
+    catch (error) {
         console.error('❌ Seeding failed:', error);
         process.exit(1);
     }
 }
-
 // Run the seed function
 seedDatabase();
