@@ -49,14 +49,14 @@ html {
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* Serif headings - Medium style */
 .font-serif {
-  font-family: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+  font-family: var(--font-playfair), 'Georgia', 'Times New Roman', serif;
 }
 
 /* ============================================

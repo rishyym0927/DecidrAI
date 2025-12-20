@@ -9,6 +9,7 @@ import { use } from 'react';
 import { useTool, useRelatedTools } from '@/hooks';
 import ToolCard from '@/components/tools/ToolCard';
 import Link from 'next/link';
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import type { Tool } from '@/types/tool';
 
 // Category colors
@@ -71,6 +72,15 @@ export default function ToolDetailPage({ params }: { params: Promise<{ slug: str
       <div className="border-b border-[var(--border)] bg-[var(--surface)]">
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-5xl mx-auto">
+            {/* Breadcrumbs */}
+            <div className="mb-6">
+              <Breadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'Tools', href: '/tools' },
+                { label: tool.name }
+              ]} />
+            </div>
+
             {/* Logo and Name */}
             <div className="flex items-start gap-6 mb-6">
               <div className={`flex-shrink-0 w-20 h-20 ${categoryColor} rounded-2xl flex items-center justify-center text-4xl overflow-hidden`}>
