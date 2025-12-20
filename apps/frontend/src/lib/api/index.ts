@@ -17,3 +17,7 @@ export * from './recommendations';
 
 // Comparison Service
 export * from './comparisons';
+
+// Auth Service
+export * from './auth';
+

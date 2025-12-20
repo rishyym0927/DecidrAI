@@ -4,10 +4,11 @@ import cors from "cors";
 import helmet from "helmet";
 import { connectMongo } from "db";
 import { createRequestLogger } from "logger";
-// import { errorHandler, notFoundHandler } from "../../../apps/api-gateway/src/middleware/errorHandler.middleware"; // REMOVED: Circular dependency
 
 import clerkWebhook from "./routes/clerkWebhook";
 import authRoutes from "./routes/auth.routes";
+import adminRoutes from "./routes/admin.routes";
+import { specs, swaggerUi } from "./swagger";
 
 dotenv.config();
 
@@ -24,8 +25,16 @@ app.use("/webhooks", clerkWebhook);
 // Body Parsing
 app.use(express.json());
 
+// Swagger Documentation
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: "DecidrAI Auth Service API"
+}));
+
 // Routes
 app.use("/auth", authRoutes);
+app.use("/admin", adminRoutes);
 
 // Health Check
 app.get("/health", async (_, res) => {
@@ -35,7 +44,12 @@ app.get("/health", async (_, res) => {
       process.env.MONGODB_DB_NAME || "decidrai"
     );
     // connectMongo returns void, but we can assume connected if no error
-    res.json({ status: "ok", service: "auth-service", db: "connected" });
+    res.json({
+      status: "ok",
+      service: "auth-service",
+      db: "connected",
+      docs: "/api-docs"
+    });
   } catch (err) {
     res.status(500).json({ status: "error", message: "DB connection failed" });
   }
@@ -61,15 +75,19 @@ if (!process.env.CLERK_WEBHOOK_SECRET) {
   throw new Error("Missing CLERK_WEBHOOK_SECRET");
 }
 
-app.listen(process.env.PORT, async () => {
+const PORT = process.env.PORT || 5002;
+
+app.listen(PORT, async () => {
   try {
     await connectMongo(
       process.env.MONGODB_URI!,
       process.env.MONGODB_DB_NAME || "decidrai"
     );
-    console.log(`🚀 Auth service running on port ${process.env.PORT}`);
+    console.log(`🚀 Auth service running on port ${PORT}`);
+    console.log(`📚 API Docs: http://localhost:${PORT}/api-docs`);
   } catch (err) {
     console.error("Failed to connect to DB on startup:", err);
     process.exit(1);
   }
 });
+

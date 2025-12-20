@@ -159,7 +159,55 @@ router.get('/recommend/session/:sessionId', aiRateLimiter, (req, res) =>
 // AUTH SERVICE ROUTES
 // ================================
 
+// Profile endpoints
 router.get('/auth/me', authMiddleware, (req, res) =>
-    proxyRequest(req, res, SERVICES.auth.url, '/me'));
+    proxyRequest(req, res, SERVICES.auth.url, '/auth/me'));
+
+router.patch('/auth/me', authMiddleware, (req, res) =>
+    proxyRequest(req, res, SERVICES.auth.url, '/auth/me'));
+
+// Saved tools endpoints
+router.get('/auth/me/saved-tools', authMiddleware, (req, res) =>
+    proxyRequest(req, res, SERVICES.auth.url, '/auth/me/saved-tools'));
+
+router.post('/auth/me/saved-tools/:toolId', authMiddleware, (req, res) =>
+    proxyRequest(req, res, SERVICES.auth.url, `/auth/me/saved-tools/${req.params.toolId}`));
+
+router.delete('/auth/me/saved-tools/:toolId', authMiddleware, (req, res) =>
+    proxyRequest(req, res, SERVICES.auth.url, `/auth/me/saved-tools/${req.params.toolId}`));
+
+// AI Stack endpoints
+router.get('/auth/me/ai-stack', authMiddleware, (req, res) =>
+    proxyRequest(req, res, SERVICES.auth.url, '/auth/me/ai-stack'));
+
+router.post('/auth/me/ai-stack', authMiddleware, (req, res) =>
+    proxyRequest(req, res, SERVICES.auth.url, '/auth/me/ai-stack'));
+
+router.delete('/auth/me/ai-stack/:toolId', authMiddleware, (req, res) =>
+    proxyRequest(req, res, SERVICES.auth.url, `/auth/me/ai-stack/${req.params.toolId}`));
+
+// Interaction endpoints
+router.post('/auth/interactions', authMiddleware, (req, res) =>
+    proxyRequest(req, res, SERVICES.auth.url, '/auth/interactions'));
+
+router.get('/auth/interactions', authMiddleware, (req, res) =>
+    proxyRequest(req, res, SERVICES.auth.url, '/auth/interactions'));
+
+// ================================
+// ADMIN ROUTES (Auth Service)
+// ================================
+
+router.get('/admin/users', authMiddleware, (req, res) =>
+    proxyRequest(req, res, SERVICES.auth.url, '/admin/users'));
+
+router.get('/admin/users/:id', authMiddleware, (req, res) =>
+    proxyRequest(req, res, SERVICES.auth.url, `/admin/users/${req.params.id}`));
+
+router.patch('/admin/users/:id/role', authMiddleware, (req, res) =>
+    proxyRequest(req, res, SERVICES.auth.url, `/admin/users/${req.params.id}/role`));
+
+router.get('/admin/analytics/users', authMiddleware, (req, res) =>
+    proxyRequest(req, res, SERVICES.auth.url, '/admin/analytics/users'));
 
 export default router;
+

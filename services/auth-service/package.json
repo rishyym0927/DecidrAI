@@ -1,7 +1,7 @@
 {
   "name": "auth-service",
   "version": "1.0.0",
-  "description": "",
+  "description": "Authentication and user management service for DecidrAI",
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -22,11 +22,15 @@
     "helmet": "^7.2.0",
     "logger": "workspace:*",
     "mongoose": "^9.0.1",
-    "svix": "^1.82.0"
+    "svix": "^1.82.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.6",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   }
