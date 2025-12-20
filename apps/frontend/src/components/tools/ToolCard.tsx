@@ -1,9 +1,11 @@
 /**
  * Tool Card Component
  * Displays tool info matching actual backend data structure
+ * Uses Next.js Image for optimized image loading
  */
 
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Tool } from '@/types/tool';
 
 interface ToolCardProps {
@@ -47,15 +49,19 @@ export default function ToolCard({ tool }: ToolCardProps) {
       className="group border border-[var(--border)] rounded-2xl p-6 hover:border-[var(--foreground)] transition-all hover-lift bg-[var(--background)]"
     >
       {/* Logo */}
-      <div className={`inline-flex items-center justify-center w-14 h-14 ${categoryColor} rounded-xl mb-4 text-2xl`}>
+      <div className={`inline-flex items-center justify-center w-14 h-14 ${categoryColor} rounded-xl mb-4 text-2xl overflow-hidden`}>
         {tool.logo_url ? (
-          <img 
+          <Image 
             src={tool.logo_url} 
             alt={tool.name}
-            className="w-10 h-10 object-contain"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            width={40}
+            height={40}
+            className="object-contain"
+            unoptimized={tool.logo_url.includes('data:')}
           />
-        ) : '🤖'}
+        ) : (
+          <span>🤖</span>
+        )}
       </div>
 
       {/* Name */}

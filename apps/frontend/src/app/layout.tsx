@@ -6,6 +6,8 @@ import Header from '@/components/layout/Header'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { QueryProvider } from '@/providers/QueryProvider'
 import { ToastProvider } from '@/providers/ToastProvider'
+import { WebVitalsProvider } from '@/providers/WebVitalsProvider'
+import ErrorBoundary from '@/components/ErrorBoundary'
 import Footer from '@/components/layout/Footer'
 import Analytics from '@/providers/AnalyticsProvider'
 
@@ -43,11 +45,15 @@ export default function RootLayout({
         <body className={`${inter.variable} ${playfair.variable}`}>
           <ThemeProvider>
             <QueryProvider>
-              <Analytics />
-              <Header />
-              {children}
-              <Footer />
-              <ToastProvider />
+              <ErrorBoundary>
+                <WebVitalsProvider>
+                  <Analytics />
+                  <Header />
+                  {children}
+                  <Footer />
+                  <ToastProvider />
+                </WebVitalsProvider>
+              </ErrorBoundary>
             </QueryProvider>
           </ThemeProvider>
         </body>

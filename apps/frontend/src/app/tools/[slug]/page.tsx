@@ -9,6 +9,7 @@ import { use } from 'react';
 import { useTool, useRelatedTools } from '@/hooks';
 import ToolCard from '@/components/tools/ToolCard';
 import Link from 'next/link';
+import Image from 'next/image';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import type { Tool } from '@/types/tool';
 
@@ -85,12 +86,17 @@ export default function ToolDetailPage({ params }: { params: Promise<{ slug: str
             <div className="flex items-start gap-6 mb-6">
               <div className={`flex-shrink-0 w-20 h-20 ${categoryColor} rounded-2xl flex items-center justify-center text-4xl overflow-hidden`}>
                 {tool.logo_url ? (
-                  <img 
+                  <Image 
                     src={tool.logo_url} 
                     alt={tool.name}
-                    className="w-16 h-16 object-contain"
+                    width={64}
+                    height={64}
+                    className="object-contain"
+                    unoptimized={tool.logo_url.includes('data:')}
                   />
-                ) : '🤖'}
+                ) : (
+                  <span>🤖</span>
+                )}
               </div>
               <div className="flex-1">
                 <h1 className="text-4xl md:text-5xl font-bold mb-3">

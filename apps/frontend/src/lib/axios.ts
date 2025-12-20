@@ -1,9 +1,10 @@
 /**
  * Axios instance configured for API Gateway communication
- * Includes interceptors for auth and error handling
+ * Includes interceptors for auth, error handling, and retry mechanism
  */
 
 import axios from 'axios';
+import axiosRetry from 'axios-retry';
 import { API_BASE_URL } from './constants';
 
 // Create axios instance
@@ -12,14 +13,32 @@ export const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-    timeout: 10000, // 10 seconds
+    timeout: 15000, // 15 seconds
+});
+
+// Configure retry mechanism with exponential backoff
+axiosRetry(api, {
+    retries: 3,
+    retryDelay: (retryCount) => {
+        // Exponential backoff: 1s, 2s, 4s
+        return Math.pow(2, retryCount - 1) * 1000;
+    },
+    retryCondition: (error) => {
+        // Retry on network errors or 5xx server errors
+        return (
+            axiosRetry.isNetworkOrIdempotentRequestError(error) ||
+            (error.response?.status !== undefined && error.response.status >= 500)
+        );
+    },
+    onRetry: (retryCount, error, requestConfig) => {
+        console.log(`Retry attempt ${retryCount} for ${requestConfig.url}`);
+    },
 });
 
 // Request interceptor - Add auth token if available
 api.interceptors.request.use(
     (config) => {
         // Get Clerk token from session storage or cookies
-        // This will be automatically handled by Clerk's useAuth hook
         const token = typeof window !== 'undefined' ? sessionStorage.getItem('clerk-token') : null;
 
         if (token) {
@@ -45,7 +64,6 @@ api.interceptors.response.use(
             // Server responded with error status
             const errorMessage = error.response.data?.message || error.response.data?.error || 'An error occurred';
 
-            // You can add global error handling here (e.g., toast notifications)
             console.error('API Error:', errorMessage);
 
             return Promise.reject({
