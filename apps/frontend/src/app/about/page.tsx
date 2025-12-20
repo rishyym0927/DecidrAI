@@ -3,7 +3,15 @@
  * Information about DecidrAI
  */
 
+import { Metadata } from 'next';
 import Link from 'next/link';
+import { generatePageMetadata } from '@/lib/seo.config';
+
+export const metadata: Metadata = generatePageMetadata({
+  title: 'About DecidrAI',
+  description: 'Learn how DecidrAI helps you discover the right AI tools through intelligent, intent-based recommendations and curated comparisons.',
+  path: '/about',
+});
 
 export default function AboutPage() {
   const features = [
