@@ -5,12 +5,13 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchTools } from '@/hooks';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ToolCard from '@/components/tools/ToolCard';
 import type { Tool } from '@/types/tool';
+import { analytics } from '@/lib/analytics';
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
@@ -19,6 +20,13 @@ export default function SearchPage() {
 
   const { data, isLoading } = useSearchTools(query, query.length > 2);
   const results: Tool[] = Array.isArray(data?.data) ? data.data : [];
+
+  // Track search when results load
+  useEffect(() => {
+    if (query.length > 2 && !isLoading && results) {
+      analytics.searchPerformed(query, results.length);
+    }
+  }, [query, isLoading, results]);
 
   return (
     <div className="min-h-screen bg-[var(--background)]">

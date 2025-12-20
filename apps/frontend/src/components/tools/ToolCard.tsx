@@ -7,9 +7,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Tool } from '@/types/tool';
+import { analytics } from '@/lib/analytics';
 
 interface ToolCardProps {
   tool: Tool;
+  source?: string;
 }
 
 // Category to color mapping
@@ -28,7 +30,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   'content-creation': 'bg-blue-500',
 };
 
-export default function ToolCard({ tool }: ToolCardProps) {
+export default function ToolCard({ tool, source = 'list' }: ToolCardProps) {
   const category = tool.categories?.[0] || 'other';
   const categoryColor = CATEGORY_COLORS[category] || 'bg-gray-500';
 
@@ -43,9 +45,14 @@ export default function ToolCard({ tool }: ToolCardProps) {
     }
   };
 
+  const handleClick = () => {
+    analytics.toolClicked(tool.slug, source);
+  };
+
   return (
     <Link
       href={`/tools/${tool.slug}`}
+      onClick={handleClick}
       className="group border border-[var(--border)] rounded-2xl p-6 hover:border-[var(--foreground)] transition-all hover-lift bg-[var(--background)]"
     >
       {/* Logo */}

@@ -1,6 +1,6 @@
 /**
- * Admin Flow Create/Edit Page
- * Form for creating or editing a discovery flow
+ * Admin Flow Create Page
+ * Form for creating a new discovery flow
  */
 
 'use client';
@@ -8,10 +8,10 @@
 import { useState } from 'react';
 import { showToast } from '@/lib/toast';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-export default function AdminFlowFormPage({ params }: { params?: { id: string } }) {
+export default function AdminFlowCreatePage() {
   const router = useRouter();
-  const isEdit = !!params?.id;
 
   const [questions, setQuestions] = useState([
     {
@@ -26,11 +26,11 @@ export default function AdminFlowFormPage({ params }: { params?: { id: string } 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // API call to create/update flow
-      showToast.success(isEdit ? 'Flow updated!' : 'Flow created!');
+      // API call to create flow
+      showToast.success('Flow created!');
       router.push('/admin/flows');
     } catch (error) {
-      showToast.error('Failed to save flow');
+      showToast.error('Failed to create flow');
     }
   };
 
@@ -50,7 +50,7 @@ export default function AdminFlowFormPage({ params }: { params?: { id: string } 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-4xl font-bold mb-8">
-        {isEdit ? 'Edit Flow' : 'Create New Flow'}
+        Create New Flow
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -184,7 +184,7 @@ export default function AdminFlowFormPage({ params }: { params?: { id: string } 
             type="submit"
             className="px-6 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg"
           >
-            {isEdit ? 'Update Flow' : 'Create Flow'}
+            Create Flow
           </button>
         </div>
       </form>
