@@ -10,6 +10,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useCompareTools, useTools } from '@/hooks';
 import Link from 'next/link';
 import type { Tool } from '@/types/tool';
+import { Share2, Copy, Check } from 'lucide-react';
+import { showToast } from '@/lib/toast';
 
 export default function ComparePage() {
   const searchParams = useSearchParams();
@@ -49,6 +51,23 @@ export default function ComparePage() {
   const clearAll = () => {
     setSelectedSlugs([]);
     router.push('/compare');
+  };
+
+  const [copied, setCopied] = useState(false);
+
+  const copyLink = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    showToast.success('Link copied to clipboard!');
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const shareOnTwitter = () => {
+    const toolNames = comparison?.tools?.map((t: any) => t.name).join(' vs ') || 'AI Tools';
+    const text = `Check out my AI tool comparison: ${toolNames}`;
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${url}`, '_blank');
   };
 
   return (
@@ -170,6 +189,27 @@ export default function ComparePage() {
                 </div>
               </section>
             )}
+
+            {/* Share Buttons */}
+            <section>
+              <h2 className="text-2xl font-bold mb-4">Share This Comparison</h2>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={copyLink}
+                  className="flex items-center gap-2 px-4 py-2 border border-[var(--border)] rounded-full hover:border-[var(--foreground)] transition-colors"
+                >
+                  {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                  {copied ? 'Copied!' : 'Copy Link'}
+                </button>
+                <button
+                  onClick={shareOnTwitter}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Share on Twitter
+                </button>
+              </div>
+            </section>
 
             {/* Winner Scenarios */}
             {comparison.winnerScenarios && comparison.winnerScenarios.length > 0 && (

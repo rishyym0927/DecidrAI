@@ -30,6 +30,14 @@ export const updateUserProfile = (data: UpdateUserPayload): Promise<UserResponse
     return api.patch('/auth/me', data);
 };
 
+/**
+ * Delete current user account
+ * This removes user data from the database
+ */
+export const deleteAccount = (): Promise<{ success: boolean; message: string }> => {
+    return api.delete('/auth/me');
+};
+
 // ==================== SAVED TOOLS ====================
 
 /**

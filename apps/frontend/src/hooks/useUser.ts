@@ -56,6 +56,25 @@ export const useUpdateProfile = () => {
     });
 };
 
+/**
+ * Delete account mutation
+ */
+export const useDeleteAccount = () => {
+    const queryClient = useQueryClient();
+    const { signOut } = useAuth();
+    const { deleteAccount } = require('@/lib/api');
+
+    return useMutation({
+        mutationFn: () => deleteAccount(),
+        onSuccess: async () => {
+            // Clear all user data from cache
+            queryClient.clear();
+            // Sign out the user (this will also clear Clerk session)
+            await signOut();
+        },
+    });
+};
+
 // ==================== SAVED TOOLS HOOKS ====================
 
 /**

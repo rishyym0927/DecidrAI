@@ -8,7 +8,8 @@ import {
     unsaveToolHandler,
     getAiStackHandler,
     addToAiStackHandler,
-    removeFromAiStackHandler
+    removeFromAiStackHandler,
+    deleteMe
 } from "../controllers/user.controller";
 import {
     trackInteractionHandler,
@@ -83,6 +84,22 @@ router.get("/me", requireAuth(), getMe);
  *         description: Updated user profile
  */
 router.patch("/me", requireAuth(), updateMe);
+
+/**
+ * @swagger
+ * /auth/me:
+ *   delete:
+ *     summary: Delete current user account
+ *     tags: [Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Account deleted successfully
+ *       404:
+ *         description: User not found
+ */
+router.delete("/me", requireAuth(), deleteMe);
 
 // ==================== SAVED TOOLS ENDPOINTS ====================
 

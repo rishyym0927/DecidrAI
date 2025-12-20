@@ -236,3 +236,38 @@ export async function removeFromAiStackHandler(req: Request, res: Response) {
         });
     }
 }
+
+// ==================== ACCOUNT DELETION ====================
+
+/**
+ * DELETE /auth/me - Delete current user account
+ * This removes user data from MongoDB. 
+ * Frontend should call Clerk's user.delete() after this succeeds.
+ */
+export async function deleteMe(req: Request, res: Response) {
+    try {
+        const { userId } = (req as any).auth;
+
+        // Delete user from MongoDB
+        const { deleteUser } = await import("../services/user.service");
+        const result = await deleteUser(userId);
+
+        if (!result) {
+            return res.status(404).json({
+                success: false,
+                error: "User not found"
+            });
+        }
+
+        return res.json({
+            success: true,
+            message: "Account deleted successfully"
+        });
+    } catch (error) {
+        console.error("[User Controller] Error deleting account:", error);
+        return res.status(500).json({
+            success: false,
+            error: "Failed to delete account"
+        });
+    }
+}

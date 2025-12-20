@@ -16,7 +16,9 @@ import {
     useAiStack, 
     useUnsaveTool, 
     useRemoveFromAiStack,
-    useUpdateProfile 
+    useUpdateProfile,
+    useDeleteAccount,
+    useUserInteractions
 } from '@/hooks';
 import { Loader2, Bookmark, Layers, History, Settings, Trash2, ExternalLink } from 'lucide-react';
 
@@ -36,6 +38,10 @@ export default function ProfilePage() {
     const unsaveMutation = useUnsaveTool();
     const removeFromStackMutation = useRemoveFromAiStack();
     const updateProfileMutation = useUpdateProfile();
+    const deleteAccountMutation = useDeleteAccount();
+
+    // Get user interactions for history
+    const { data: interactionsData, isLoading: historyLoading } = useUserInteractions({ limit: 20 });
 
     // Preferences state
     const [emailNotifications, setEmailNotifications] = useState(
@@ -328,20 +334,53 @@ export default function ProfilePage() {
                     {/* History Tab */}
                     {activeTab === 'history' && (
                         <div>
-                            <h2 className="text-2xl font-bold mb-6">History</h2>
-                            <div className="text-center py-16 border border-[var(--border)] rounded-2xl">
-                                <History className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                                <h3 className="text-xl font-bold mb-2">Coming Soon</h3>
-                                <p className="text-[var(--muted)] mb-6">
-                                    View your interaction history and flow completions
-                                </p>
-                                <Link
-                                    href="/discover"
-                                    className="inline-block px-6 py-3 bg-[var(--foreground)] text-[var(--background)] rounded-full font-semibold hover:opacity-80 transition-opacity"
-                                >
-                                    Start Discovery
-                                </Link>
-                            </div>
+                            <h2 className="text-2xl font-bold mb-6">Activity History</h2>
+                            
+                            {historyLoading ? (
+                                <div className="flex justify-center py-12">
+                                    <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                                </div>
+                            ) : interactionsData?.data && interactionsData.data.length > 0 ? (
+                                <div className="space-y-4">
+                                    {interactionsData.data.map((interaction: any) => (
+                                        <div
+                                            key={interaction._id}
+                                            className="flex items-start gap-4 p-4 border border-[var(--border)] rounded-xl"
+                                        >
+                                            <div className="flex-shrink-0 w-10 h-10 bg-[var(--surface)] rounded-full flex items-center justify-center">
+                                                {interaction.eventType === 'view' && '👁️'}
+                                                {interaction.eventType === 'click' && '👆'}
+                                                {interaction.eventType === 'save' && '💾'}
+                                                {interaction.eventType === 'compare' && '⚖️'}
+                                                {interaction.eventType === 'flow_start' && '🚀'}
+                                                {interaction.eventType === 'flow_complete' && '✅'}
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-medium capitalize">
+                                                    {interaction.eventType.replace('_', ' ')}
+                                                </p>
+                                                <p className="text-sm text-[var(--muted)]">
+                                                    {new Date(interaction.createdAt).toLocaleString()}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-16 border border-[var(--border)] rounded-2xl">
+                                    <History className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                                    <h3 className="text-xl font-bold mb-2">No Activity Yet</h3>
+                                    <p className="text-[var(--muted)] mb-6">
+                                        Your tool views, saves, and flow completions will appear here
+                                    </p>
+                                    <Link
+                                        href="/discover"
+                                        className="inline-block px-6 py-3 bg-[var(--foreground)] text-[var(--background)] rounded-full font-semibold hover:opacity-80 transition-opacity"
+                                    >
+                                        Start Discovery
+                                    </Link>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -403,8 +442,11 @@ export default function ProfilePage() {
                                     </p>
                                     <ConfirmDialog
                                         trigger={
-                                            <button className="px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors">
-                                                Delete Account
+                                            <button 
+                                                className="px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
+                                                disabled={deleteAccountMutation.isPending}
+                                            >
+                                                {deleteAccountMutation.isPending ? 'Deleting...' : 'Delete Account'}
                                             </button>
                                         }
                                         title="Delete Your Account?"
@@ -412,8 +454,7 @@ export default function ProfilePage() {
                                         confirmText="Delete My Account"
                                         destructive
                                         onConfirm={() => {
-                                            // TODO: Implement account deletion via Clerk
-                                            console.log('Deleting account...');
+                                            deleteAccountMutation.mutate();
                                         }}
                                     />
                                 </div>

@@ -5,11 +5,17 @@
 
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ToolCard from '@/components/tools/ToolCard';
 import type { Tool } from '@/types/tool';
+import { useAuth } from '@clerk/nextjs';
+import { useSaveTool, useUnsaveTool, useSavedTools, useAddToAiStack } from '@/hooks';
+import { Heart, Plus, Loader2 } from 'lucide-react';
+import { showToast } from '@/lib/toast';
+import { analytics } from '@/lib/analytics';
 
 // Category colors
 const CATEGORY_COLORS: Record<string, string> = {
@@ -29,8 +35,62 @@ interface ToolDetailClientProps {
 }
 
 export default function ToolDetailClient({ tool, relatedTools }: ToolDetailClientProps) {
+  const { isSignedIn } = useAuth();
   const category = tool.categories?.[0] || 'other';
   const categoryColor = CATEGORY_COLORS[category] || 'bg-gray-500';
+  const [showStackModal, setShowStackModal] = useState(false);
+  const [stackCategory, setStackCategory] = useState('');
+
+  // Save functionality
+  const { data: savedToolsData } = useSavedTools();
+  const saveMutation = useSaveTool();
+  const unsaveMutation = useUnsaveTool();
+  const addToStackMutation = useAddToAiStack();
+  
+  const isSaved = savedToolsData?.data?.some(
+    (saved: any) => saved.toolId === tool._id || saved.toolId?._id === tool._id
+  ) ?? false;
+
+  const handleSave = () => {
+    if (!isSignedIn) {
+      showToast.error('Please sign in to save tools');
+      return;
+    }
+    if (isSaved) {
+      unsaveMutation.mutate(tool._id, {
+        onSuccess: () => showToast.success('Removed from saved'),
+        onError: () => showToast.error('Failed to remove'),
+      });
+    } else {
+      saveMutation.mutate({ toolId: tool._id }, {
+        onSuccess: () => showToast.success('Tool saved!'),
+        onError: () => showToast.error('Failed to save'),
+      });
+    }
+  };
+
+  const handleAddToStack = () => {
+    if (!isSignedIn) {
+      showToast.error('Please sign in to add to your stack');
+      return;
+    }
+    if (!stackCategory) {
+      showToast.error('Please select a category');
+      return;
+    }
+    addToStackMutation.mutate({ toolId: tool._id, category: stackCategory }, {
+      onSuccess: () => {
+        showToast.success('Added to your AI Stack!');
+        setShowStackModal(false);
+        setStackCategory('');
+      },
+      onError: () => showToast.error('Failed to add to stack'),
+    });
+  };
+
+  const handleWebsiteClick = () => {
+    analytics.toolClicked(tool.slug, 'detail_page');
+  };
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
@@ -182,17 +242,80 @@ export default function ToolDetailClient({ tool, relatedTools }: ToolDetailClien
                   href={tool.website_url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={handleWebsiteClick}
                   className="block w-full px-6 py-3 bg-[var(--foreground)] text-[var(--background)] rounded-full font-semibold text-center hover:opacity-80 transition-opacity mb-3"
                 >
                   Visit Website →
                 </a>
                 <Link
                   href={`/compare?tools=${tool.slug}`}
-                  className="block w-full px-6 py-3 border-2 border-[var(--foreground)] text-[var(--foreground)] rounded-full font-semibold text-center hover:bg-[var(--background)] transition-colors"
+                  className="block w-full px-6 py-3 border-2 border-[var(--foreground)] text-[var(--foreground)] rounded-full font-semibold text-center hover:bg-[var(--background)] transition-colors mb-3"
                 >
                   Compare Tool
                 </Link>
+                
+                {/* Save Button */}
+                <button
+                  onClick={handleSave}
+                  disabled={saveMutation.isPending || unsaveMutation.isPending}
+                  className={`flex items-center justify-center gap-2 w-full px-6 py-3 rounded-full font-semibold transition-colors mb-3 ${
+                    isSaved 
+                      ? 'bg-red-500 text-white hover:bg-red-600' 
+                      : 'border-2 border-gray-300 text-gray-600 hover:border-red-500 hover:text-red-500'
+                  }`}
+                >
+                  <Heart className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`} />
+                  {saveMutation.isPending || unsaveMutation.isPending ? 'Saving...' : isSaved ? 'Saved' : 'Save Tool'}
+                </button>
+
+                {/* Add to Stack Button */}
+                <button
+                  onClick={() => setShowStackModal(true)}
+                  className="flex items-center justify-center gap-2 w-full px-6 py-3 border-2 border-purple-500 text-purple-500 rounded-full font-semibold hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
+                >
+                  <Plus className="w-5 h-5" />
+                  Add to AI Stack
+                </button>
               </div>
+
+              {/* Add to Stack Modal */}
+              {showStackModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                  <div className="bg-[var(--background)] rounded-2xl p-6 max-w-md w-full mx-4">
+                    <h3 className="text-xl font-bold mb-4">Add to Your AI Stack</h3>
+                    <p className="text-[var(--muted)] mb-4">Choose a category for {tool.name}</p>
+                    <select
+                      value={stackCategory}
+                      onChange={(e) => setStackCategory(e.target.value)}
+                      className="w-full p-3 border border-[var(--border)] rounded-lg mb-4 bg-[var(--background)]"
+                    >
+                      <option value="">Select category...</option>
+                      <option value="Writing">Writing</option>
+                      <option value="Coding">Coding</option>
+                      <option value="Design">Design</option>
+                      <option value="Research">Research</option>
+                      <option value="Productivity">Productivity</option>
+                      <option value="Marketing">Marketing</option>
+                      <option value="Other">Other</option>
+                    </select>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setShowStackModal(false)}
+                        className="flex-1 px-4 py-2 border border-[var(--border)] rounded-lg"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleAddToStack}
+                        disabled={addToStackMutation.isPending || !stackCategory}
+                        className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg disabled:opacity-50"
+                      >
+                        {addToStackMutation.isPending ? 'Adding...' : 'Add to Stack'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Pricing Info */}
               <div className="border border-[var(--border)] rounded-2xl p-6">
