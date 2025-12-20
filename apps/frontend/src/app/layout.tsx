@@ -10,6 +10,7 @@ import { WebVitalsProvider } from '@/providers/WebVitalsProvider'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import Footer from '@/components/layout/Footer'
 import Analytics from '@/providers/AnalyticsProvider'
+import OfflineIndicator from '@/components/ui/OfflineIndicator'
 import { SITE_CONFIG, generateOrganizationSchema, generateWebSiteSchema } from '@/lib/seo.config'
 
 const inter = Inter({
@@ -159,6 +160,7 @@ export default function RootLayout({
                   {children}
                   <Footer />
                   <ToastProvider />
+                  <OfflineIndicator />
                 </WebVitalsProvider>
               </ErrorBoundary>
             </QueryProvider>

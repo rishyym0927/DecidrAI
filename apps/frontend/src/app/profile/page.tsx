@@ -8,6 +8,8 @@
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
+import Image from 'next/image';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 // Tab type
 type ProfileTab = 'saved' | 'history' | 'settings';
@@ -71,10 +73,13 @@ export default function ProfilePage() {
             {/* Avatar */}
             <div className="w-20 h-20 rounded-full overflow-hidden bg-[var(--background)] border-2 border-[var(--border)]">
               {user?.imageUrl ? (
-                <img
+                <Image
                   src={user.imageUrl}
-                  alt={user.fullName || 'Profile'}
+                  alt={user.fullName || 'Profile picture'}
+                  width={80}
+                  height={80}
                   className="w-full h-full object-cover"
+                  priority
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-3xl">
@@ -148,15 +153,19 @@ export default function ProfilePage() {
                         <span className="px-3 py-1 bg-[var(--surface)] rounded-full text-xs capitalize">
                           {tool.category}
                         </span>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            // Remove from saved
+                        <ConfirmDialog
+                          trigger={
+                            <span className="text-red-500 hover:text-red-600">Remove</span>
+                          }
+                          title="Remove Saved Tool?"
+                          description={`Are you sure you want to remove "${tool.name}" from your saved tools?`}
+                          confirmText="Remove"
+                          destructive
+                          onConfirm={() => {
+                            // TODO: Implement remove from saved
+                            console.log('Removing tool:', tool.slug);
                           }}
-                          className="text-red-500 hover:text-red-600"
-                        >
-                          Remove
-                        </button>
+                        />
                       </div>
                     </Link>
                   ))}
@@ -282,9 +291,21 @@ export default function ProfilePage() {
                   <p className="text-sm text-[var(--muted)] mb-4">
                     Permanently delete your account and all associated data
                   </p>
-                  <button className="px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors">
-                    Delete Account
-                  </button>
+                  <ConfirmDialog
+                    trigger={
+                      <button className="px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors">
+                        Delete Account
+                      </button>
+                    }
+                    title="Delete Your Account?"
+                    description="This action cannot be undone. All your saved tools, flow history, and preferences will be permanently deleted."
+                    confirmText="Delete My Account"
+                    destructive
+                    onConfirm={() => {
+                      // TODO: Implement account deletion via Clerk
+                      console.log('Deleting account...');
+                    }}
+                  />
                 </div>
               </div>
             </div>

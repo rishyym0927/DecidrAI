@@ -7,6 +7,7 @@
 
 import { useState } from 'react';
 import { useTools, useSearchTools } from '@/hooks';
+import { useDebounceWithPending } from '@/hooks/useDebounce';
 import ToolCard from '@/components/tools/ToolCard';
 import ToolsFilter from '@/components/tools/ToolsFilter';
 import type { Tool, ToolFilters } from '@/types/tool';
@@ -19,8 +20,11 @@ export default function ToolsPage() {
     sort: 'newest',
   });
 
-  // Determine if we should search
-  const isSearching = searchQuery.length >= 3;
+  // Debounce search query with 400ms delay
+  const { debouncedValue: debouncedQuery, isPending: isDebouncing } = useDebounceWithPending(searchQuery, 400);
+
+  // Determine if we should search (using debounced value)
+  const isSearching = debouncedQuery.length >= 3;
 
   // Fetch tools list (always runs)
   const { 
@@ -28,14 +32,14 @@ export default function ToolsPage() {
     isLoading: isLoadingTools 
   } = useTools(filters);
 
-  // Search tools (only runs when query is 3+ chars)
+  // Search tools (only runs when debounced query is 3+ chars)
   const { 
     data: searchResponse, 
     isLoading: isSearchingTools 
-  } = useSearchTools(searchQuery, isSearching);
+  } = useSearchTools(debouncedQuery, isSearching);
 
-  // Determine which data to show
-  const isLoading = isSearching ? isSearchingTools : isLoadingTools;
+  // Determine which data to show - include debouncing state
+  const isLoading = isDebouncing || (isSearching ? isSearchingTools : isLoadingTools);
   
   // Handle different response structures:
   // - List: { success, data: { tools: [], pagination: {} } }

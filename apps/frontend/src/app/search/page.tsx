@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchTools } from '@/hooks';
+import { useDebounceWithPending } from '@/hooks/useDebounce';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ToolCard from '@/components/tools/ToolCard';
@@ -18,15 +19,21 @@ export default function SearchPage() {
   const initialQuery = searchParams.get('q') || '';
   const [query, setQuery] = useState(initialQuery);
 
-  const { data, isLoading } = useSearchTools(query, query.length > 2);
+  // Debounce search query with 400ms delay
+  const { debouncedValue: debouncedQuery, isPending: isDebouncing } = useDebounceWithPending(query, 400);
+
+  const { data, isLoading: isSearching } = useSearchTools(debouncedQuery, debouncedQuery.length > 2);
   const results: Tool[] = Array.isArray(data?.data) ? data.data : [];
+  
+  // Combined loading state includes debouncing
+  const isLoading = isDebouncing || isSearching;
 
   // Track search when results load
   useEffect(() => {
-    if (query.length > 2 && !isLoading && results) {
-      analytics.searchPerformed(query, results.length);
+    if (debouncedQuery.length > 2 && !isSearching && results) {
+      analytics.searchPerformed(debouncedQuery, results.length);
     }
-  }, [query, isLoading, results]);
+  }, [debouncedQuery, isSearching, results]);
 
   return (
     <div className="min-h-screen bg-[var(--background)]">

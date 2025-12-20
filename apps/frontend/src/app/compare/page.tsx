@@ -70,15 +70,26 @@ export default function ComparePage() {
         <section className="mb-12">
           <h2 className="text-xl font-bold mb-4">Select Tools to Compare</h2>
           
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex flex-wrap gap-2 mb-6" role="group" aria-label="Select tools to compare">
             {allTools.map((tool: Tool) => {
               const isSelected = selectedSlugs.includes(tool.slug);
+              const isDisabled = !isSelected && selectedSlugs.length >= 4;
               return (
                 <button
                   key={tool.slug}
                   onClick={() => isSelected ? removeTool(tool.slug) : addTool(tool.slug)}
-                  disabled={!isSelected && selectedSlugs.length >= 4}
-                  className={`px-4 py-2 rounded-full font-medium transition-all ${
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      if (!isDisabled) {
+                        isSelected ? removeTool(tool.slug) : addTool(tool.slug);
+                      }
+                    }
+                  }}
+                  disabled={isDisabled}
+                  aria-pressed={isSelected}
+                  aria-label={`${isSelected ? 'Remove' : 'Add'} ${tool.name} ${isDisabled ? '(maximum 4 tools selected)' : ''}`}
+                  className={`px-4 py-2 rounded-full font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--foreground)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] ${
                     isSelected
                       ? 'bg-[var(--foreground)] text-[var(--background)]'
                       : 'bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--foreground)] disabled:opacity-50 disabled:cursor-not-allowed'
